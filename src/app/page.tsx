@@ -262,7 +262,7 @@ export default function HomePage() {
       {/* 輔助下注工具推薦 */}
       <div className="mt-12 pt-8 border-t border-border/30">
         <h3 className="text-sm font-semibold text-muted-foreground mb-4">輔助下注工具</h3>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
           <a
             href="https://Qsignals.net"
             target="_blank"
@@ -297,6 +297,18 @@ export default function HomePage() {
             <div>
               <p className="text-sm font-semibold">加密策略跟單</p>
               <p className="text-xs text-muted-foreground">copy-trading</p>
+            </div>
+          </a>
+          <a
+            href="https://texasporker-production.up.railway.app/lobby"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-3 rounded-xl border border-border/50 bg-card px-4 py-3 hover:border-border transition-colors"
+          >
+            <span className="text-lg">🃏</span>
+            <div>
+              <p className="text-sm font-semibold">線上德州撲克</p>
+              <p className="text-xs text-muted-foreground">Texas Porker</p>
             </div>
           </a>
         </div>
