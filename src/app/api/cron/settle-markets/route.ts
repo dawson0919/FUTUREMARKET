@@ -77,6 +77,16 @@ export async function POST(request: Request) {
       continue;
     }
 
+    // Aggregate updates per user to avoid stale-data race condition
+    const userUpdates = new Map<string, {
+      totalPayout: number;
+      totalProfit: number;
+      trades: number;
+      wins: number;
+      losses: number;
+      payoutTxns: { side: string; amount: number }[];
+    }>();
+
     for (const pos of positions) {
       const payout = calculateSettlement(
         pos.amount,
@@ -100,28 +110,60 @@ export async function POST(request: Request) {
         .update({ settled: true, payout })
         .eq("id", pos.id);
 
-      // Update user balance and stats
-      await db
-        .from("profiles")
-        .update({
-          chips_balance: profile.chips_balance + payout,
-          total_profit: profile.total_profit + profit,
-          total_trades: profile.total_trades + 1,
-          wins: isWin ? profile.wins + 1 : profile.wins,
-          losses: !isWin ? profile.losses + 1 : profile.losses,
-          updated_at: new Date().toISOString(),
-        })
-        .eq("id", profile.id);
+      // Aggregate per user
+      const existing = userUpdates.get(profile.id);
+      if (existing) {
+        existing.totalPayout += payout;
+        existing.totalProfit += profit;
+        existing.trades += 1;
+        existing.wins += isWin ? 1 : 0;
+        existing.losses += !isWin ? 1 : 0;
+        if (payout > 0) {
+          existing.payoutTxns.push({ side: pos.side, amount: payout });
+        }
+      } else {
+        userUpdates.set(profile.id, {
+          totalPayout: payout,
+          totalProfit: profit,
+          trades: 1,
+          wins: isWin ? 1 : 0,
+          losses: !isWin ? 1 : 0,
+          payoutTxns: payout > 0 ? [{ side: pos.side, amount: payout }] : [],
+        });
+      }
+    }
 
-      // Record payout transaction
-      if (payout > 0) {
+    // Apply aggregated updates per user (one DB call per user per market)
+    for (const [userId, agg] of userUpdates) {
+      // Re-fetch fresh profile to avoid stale-data overwrites
+      const { data: freshProfile } = await db
+        .from("profiles")
+        .select("chips_balance, total_profit, total_trades, wins, losses")
+        .eq("id", userId)
+        .single();
+
+      if (freshProfile) {
+        await db
+          .from("profiles")
+          .update({
+            chips_balance: freshProfile.chips_balance + agg.totalPayout,
+            total_profit: freshProfile.total_profit + agg.totalProfit,
+            total_trades: freshProfile.total_trades + agg.trades,
+            wins: freshProfile.wins + agg.wins,
+            losses: freshProfile.losses + agg.losses,
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", userId);
+      }
+
+      // Record payout transactions
+      for (const txn of agg.payoutTxns) {
         await db.from("transactions").insert({
-          user_id: profile.id,
+          user_id: userId,
           market_id: market.id,
           type: "payout",
-          side: pos.side,
-          amount: payout,
-          balance_after: profile.chips_balance + payout,
+          side: txn.side,
+          amount: txn.amount,
         });
       }
     }

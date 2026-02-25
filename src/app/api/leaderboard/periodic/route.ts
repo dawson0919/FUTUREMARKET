@@ -26,61 +26,60 @@ export async function GET(request: NextRequest) {
 
   const periodStart = getPeriodStart(period);
 
-  // Fetch all transactions within the period
-  const { data: transactions, error } = await supabase
-    .from("transactions")
-    .select("user_id, type, amount, market_id")
-    .gte("created_at", periodStart)
-    .in("type", ["bet", "payout"]);
+  // Get markets that were settled within the period
+  const { data: periodMarkets } = await supabase
+    .from("markets")
+    .select("id")
+    .eq("status", "settled")
+    .gte("close_time", periodStart);
+
+  if (!periodMarkets || periodMarkets.length === 0) {
+    return NextResponse.json({ leaderboard: [] });
+  }
+
+  const marketIds = periodMarkets.map((m) => m.id);
+
+  // Compute from settled positions in those markets
+  const { data: positions, error } = await supabase
+    .from("positions")
+    .select("user_id, amount, payout, market_id")
+    .eq("settled", true)
+    .in("market_id", marketIds);
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  if (!transactions || transactions.length === 0) {
+  if (!positions || positions.length === 0) {
     return NextResponse.json({ leaderboard: [] });
   }
 
   // Aggregate by user
-  const userStats: Record<string, {
-    user_id: string;
-    bets: number;
-    payouts: number;
-    trade_count: number;
-    win_markets: Set<string>;
-  }> = {};
+  const userStats: Record<
+    string,
+    { profit: number; trades: number; wins: number }
+  > = {};
 
-  for (const tx of transactions) {
-    if (!userStats[tx.user_id]) {
-      userStats[tx.user_id] = {
-        user_id: tx.user_id,
-        bets: 0,
-        payouts: 0,
-        trade_count: 0,
-        win_markets: new Set(),
-      };
+  for (const pos of positions) {
+    if (!userStats[pos.user_id]) {
+      userStats[pos.user_id] = { profit: 0, trades: 0, wins: 0 };
     }
-    const stat = userStats[tx.user_id];
-    if (tx.type === "bet") {
-      stat.bets += tx.amount;
-      stat.trade_count += 1;
-    } else if (tx.type === "payout") {
-      stat.payouts += tx.amount;
-      if (tx.amount > 0) {
-        stat.win_markets.add(tx.market_id);
-      }
+    const s = userStats[pos.user_id];
+    s.profit += (pos.payout || 0) - pos.amount;
+    s.trades += 1;
+    if ((pos.payout || 0) > 0) {
+      s.wins += 1;
     }
   }
 
-  // Calculate profit and filter
-  const entries = Object.values(userStats)
-    .map((s) => ({
-      user_id: s.user_id,
-      period_profit: s.payouts - s.bets,
-      period_trades: s.trade_count,
-      period_wins: s.win_markets.size,
+  // Filter and sort
+  const entries = Object.entries(userStats)
+    .map(([uid, s]) => ({
+      user_id: uid,
+      period_profit: s.profit,
+      period_trades: s.trades,
+      period_wins: s.wins,
     }))
-    .filter((e) => e.period_profit !== 0)
     .sort((a, b) => b.period_profit - a.period_profit)
     .slice(0, 50);
 

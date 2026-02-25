@@ -100,10 +100,14 @@ export default function PortfolioPage() {
 
   const openPositions = positions.filter((p) => !p.settled);
   const settledPositions = positions.filter((p) => p.settled);
-  const winRate =
-    profile && profile.total_trades > 0
-      ? Math.round((profile.wins / profile.total_trades) * 100)
-      : 0;
+
+  // Compute accurate stats from settled positions only
+  const settledWins = settledPositions.filter((p) => (p.payout || 0) > 0).length;
+  const settledTrades = settledPositions.length;
+  const settledProfit = settledPositions.reduce(
+    (sum, p) => sum + ((p.payout || 0) - p.amount), 0
+  );
+  const winRate = settledTrades > 0 ? Math.round((settledWins / settledTrades) * 100) : 0;
 
   return (
     <div>
@@ -121,7 +125,7 @@ export default function PortfolioPage() {
           </Card>
           <Card className="p-4 border-border/50">
             <div className="flex items-center gap-2 text-muted-foreground mb-1">
-              {profile.total_profit >= 0 ? (
+              {settledProfit >= 0 ? (
                 <TrendingUp className="h-4 w-4 text-emerald-400" />
               ) : (
                 <TrendingDown className="h-4 w-4 text-red-400" />
@@ -130,11 +134,11 @@ export default function PortfolioPage() {
             </div>
             <p
               className={`text-xl font-bold ${
-                profile.total_profit >= 0 ? "text-emerald-400" : "text-red-400"
+                settledProfit >= 0 ? "text-emerald-400" : "text-red-400"
               }`}
             >
-              {profile.total_profit >= 0 ? "+" : ""}
-              {formatChips(profile.total_profit)}
+              {settledProfit >= 0 ? "+" : ""}
+              {formatChips(settledProfit)}
             </p>
           </Card>
           <Card className="p-4 border-border/50">
@@ -147,9 +151,9 @@ export default function PortfolioPage() {
           <Card className="p-4 border-border/50">
             <div className="flex items-center gap-2 text-muted-foreground mb-1">
               <History className="h-4 w-4" />
-              <span className="text-xs">總交易筆數</span>
+              <span className="text-xs">已結算筆數</span>
             </div>
-            <p className="text-xl font-bold">{profile.total_trades}</p>
+            <p className="text-xl font-bold">{settledTrades}</p>
           </Card>
         </div>
       )}
