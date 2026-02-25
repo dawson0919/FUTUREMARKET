@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { SignInButton, SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
+import { SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
 import { TrendingUp, Trophy, Briefcase, Coins } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -80,9 +80,9 @@ export function Header() {
                 />
               </SignedIn>
               <SignedOut>
-                <SignInButton mode="modal">
+                <Link href="/sign-in">
                   <Button size="sm">Sign In</Button>
-                </SignInButton>
+                </Link>
               </SignedOut>
             </>
           )}
