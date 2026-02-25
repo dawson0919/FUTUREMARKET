@@ -1,0 +1,48 @@
+name: Scheduled Cron Jobs
+
+on:
+  schedule:
+    # 結算市場：每 30 分鐘執行一次
+    # ES/NQ 收盤 21:00 UTC, 加密貨幣 00:00 UTC
+    - cron: '*/30 * * * *'
+  workflow_dispatch: # 允許手動觸發
+
+jobs:
+  settle-markets:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger settle-markets
+        run: |
+          curl -s -X POST \
+            "https://futuremarket-production.up.railway.app/api/cron/settle-markets" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            -H "Content-Type: application/json" \
+            --max-time 30
+          echo ""
+          echo "Settlement triggered at $(date -u)"
+
+  create-markets:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check if market creation time (08:00 Taiwan / 00:00 UTC)
+        id: check-time
+        run: |
+          HOUR=$(date -u +%H)
+          MINUTE=$(date -u +%M)
+          # 只在 00:00 UTC (08:00 台灣) 左右執行建立市場
+          if [ "$HOUR" = "00" ] && [ "$MINUTE" -lt "30" ]; then
+            echo "should_run=true" >> $GITHUB_OUTPUT
+          else
+            echo "should_run=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Trigger create-markets
+        if: steps.check-time.outputs.should_run == 'true'
+        run: |
+          curl -s -X POST \
+            "https://futuremarket-production.up.railway.app/api/cron/create-markets" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            -H "Content-Type: application/json" \
+            --max-time 30
+          echo ""
+          echo "Market creation triggered at $(date -u)"
