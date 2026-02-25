@@ -26,25 +26,12 @@ export async function GET(request: NextRequest) {
 
   const periodStart = getPeriodStart(period);
 
-  // Get markets that were settled within the period
-  const { data: periodMarkets } = await supabase
-    .from("markets")
-    .select("id")
-    .eq("status", "settled")
-    .gte("close_time", periodStart);
-
-  if (!periodMarkets || periodMarkets.length === 0) {
-    return NextResponse.json({ leaderboard: [] });
-  }
-
-  const marketIds = periodMarkets.map((m) => m.id);
-
-  // Compute from settled positions in those markets
+  // Compute from settled positions created within the period
   const { data: positions, error } = await supabase
     .from("positions")
-    .select("user_id, amount, payout, market_id")
+    .select("user_id, amount, payout")
     .eq("settled", true)
-    .in("market_id", marketIds);
+    .gte("created_at", periodStart);
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
