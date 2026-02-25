@@ -148,9 +148,23 @@ export default function HomePage() {
       {/* Hero */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">預測市場</h1>
-        <p className="text-muted-foreground">
+        <p className="text-muted-foreground mb-4">
           預測期貨與加密貨幣的每日收盤價，用免費籌碼下注，登上排行榜！
         </p>
+        <div className="flex flex-wrap gap-3 text-xs">
+          <div className="flex items-center gap-1.5 bg-secondary rounded-lg px-3 py-1.5">
+            <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
+            <span className="text-muted-foreground">加密貨幣收盤：</span>
+            <span className="text-foreground font-semibold">每日 08:00 (台灣)</span>
+            <span className="text-muted-foreground">· 06:00 停止下注</span>
+          </div>
+          <div className="flex items-center gap-1.5 bg-secondary rounded-lg px-3 py-1.5">
+            <span className="h-1.5 w-1.5 rounded-full bg-blue-400" />
+            <span className="text-muted-foreground">期貨收盤：</span>
+            <span className="text-foreground font-semibold">每日 05:00 (台灣)</span>
+            <span className="text-muted-foreground">· 03:00 停止下注</span>
+          </div>
+        </div>
       </div>
 
       {/* Filters */}
