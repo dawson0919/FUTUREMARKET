@@ -7,6 +7,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { UpDownCard } from "@/components/market/UpDownCard";
 import { TopWinnersCard } from "@/components/leaderboard/TopWinnersCard";
+import { DailyCheckinBanner } from "@/components/checkin/DailyCheckinBanner";
 import { usePrices } from "@/lib/hooks";
 import { supabase } from "@/lib/supabase";
 import { INSTRUMENTS, formatPrice, formatChips, INSTRUMENT_COLORS } from "@/lib/constants";
@@ -186,6 +187,9 @@ export default function HomePage() {
         </div>
       </div>
 
+      {/* Daily Check-in */}
+      <DailyCheckinBanner />
+
       {/* Top Winners Card */}
       <TopWinnersCard />
 
@@ -254,6 +258,49 @@ export default function HomePage() {
           )}
         </>
       )}
+
+      {/* 輔助下注工具推薦 */}
+      <div className="mt-12 pt-8 border-t border-border/30">
+        <h3 className="text-sm font-semibold text-muted-foreground mb-4">輔助下注工具</h3>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <a
+            href="https://Qsignals.net"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-3 rounded-xl border border-border/50 bg-card px-4 py-3 hover:border-border transition-colors"
+          >
+            <span className="text-lg">📊</span>
+            <div>
+              <p className="text-sm font-semibold">量化交易信號網</p>
+              <p className="text-xs text-muted-foreground">Qsignals.net</p>
+            </div>
+          </a>
+          <a
+            href="https://bitpredict.net/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-3 rounded-xl border border-border/50 bg-card px-4 py-3 hover:border-border transition-colors"
+          >
+            <span className="text-lg">🔮</span>
+            <div>
+              <p className="text-sm font-semibold">免費預測報告</p>
+              <p className="text-xs text-muted-foreground">bitpredict.net</p>
+            </div>
+          </a>
+          <a
+            href="https://copy-trading-strateg-had8.bolt.host/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-3 rounded-xl border border-border/50 bg-card px-4 py-3 hover:border-border transition-colors"
+          >
+            <span className="text-lg">🤖</span>
+            <div>
+              <p className="text-sm font-semibold">加密策略跟單</p>
+              <p className="text-xs text-muted-foreground">copy-trading</p>
+            </div>
+          </a>
+        </div>
+      </div>
     </div>
   );
 }

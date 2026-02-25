@@ -21,6 +21,8 @@ export interface Profile {
   wins: number;
   losses: number;
   created_at: string;
+  last_checkin_date: string | null;
+  checkin_streak: number;
 }
 
 export interface Market {
@@ -52,6 +54,7 @@ export interface Position {
   potential_payout: number;
   settled: boolean;
   payout: number | null;
+  result_seen: boolean;
   created_at: string;
   market?: Market;
 }
@@ -60,7 +63,7 @@ export interface Transaction {
   id: string;
   user_id: string;
   market_id: string;
-  type: "bet" | "payout" | "refund";
+  type: "bet" | "payout" | "refund" | "checkin";
   side: "yes" | "no" | null;
   amount: number;
   balance_after: number;

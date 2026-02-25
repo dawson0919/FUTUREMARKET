@@ -3,6 +3,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import { dark } from "@clerk/themes";
 import { Header } from "@/components/layout/Header";
+import { ToastProvider } from "@/components/ui/toast-notification";
+import { SettlementNotifier } from "@/components/layout/SettlementNotifier";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -65,8 +67,11 @@ export default function RootLayout({
           style={{ backgroundColor: "#000000", color: "#f0f0f0" }}
           suppressHydrationWarning
         >
-          <Header />
-          <main className="mx-auto max-w-7xl px-4 py-6">{children}</main>
+          <ToastProvider>
+            <Header />
+            <SettlementNotifier />
+            <main className="mx-auto max-w-7xl px-4 py-6">{children}</main>
+          </ToastProvider>
         </body>
       </html>
     </ClerkProvider>

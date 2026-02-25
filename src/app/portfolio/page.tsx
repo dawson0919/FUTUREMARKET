@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useUser } from "@clerk/nextjs";
 import Link from "next/link";
-import { Coins, TrendingUp, TrendingDown, Award, History } from "lucide-react";
+import { Coins, TrendingUp, TrendingDown, Award, History, Flame, Target, Star, Zap } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -22,6 +22,14 @@ export default function PortfolioPage() {
   const [positions, setPositions] = useState<PositionWithMarket[]>([]);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState<{
+    best_trade: number;
+    worst_trade: number;
+    current_streak: number;
+    best_streak: number;
+    checkin_streak: number;
+    favorite_instrument: string | null;
+  } | null>(null);
 
   useEffect(() => {
     async function fetchData() {
@@ -58,6 +66,16 @@ export default function PortfolioPage() {
         );
       }
       if (txResult.data) setTransactions(txResult.data);
+
+      // Fetch detailed stats
+      try {
+        const statsRes = await fetch("/api/user/stats", { credentials: "include" });
+        const statsData = await statsRes.json();
+        if (statsData.stats) setStats(statsData.stats);
+      } catch {
+        // Non-critical
+      }
+
       setLoading(false);
     }
 
@@ -136,6 +154,51 @@ export default function PortfolioPage() {
         </div>
       )}
 
+      {/* Detailed stats */}
+      {stats && (
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 mb-8">
+          <Card className="p-4 border-border/50">
+            <div className="flex items-center gap-2 text-muted-foreground mb-1">
+              <Star className="h-4 w-4 text-emerald-400" />
+              <span className="text-xs">最佳單筆</span>
+            </div>
+            <p className={`text-lg font-bold ${stats.best_trade > 0 ? "text-emerald-400" : ""}`}>
+              {stats.best_trade > 0 ? "+" : ""}{formatChips(stats.best_trade)}
+            </p>
+          </Card>
+          <Card className="p-4 border-border/50">
+            <div className="flex items-center gap-2 text-muted-foreground mb-1">
+              <TrendingDown className="h-4 w-4 text-red-400" />
+              <span className="text-xs">最大虧損</span>
+            </div>
+            <p className={`text-lg font-bold ${stats.worst_trade < 0 ? "text-red-400" : ""}`}>
+              {formatChips(stats.worst_trade)}
+            </p>
+          </Card>
+          <Card className="p-4 border-border/50">
+            <div className="flex items-center gap-2 text-muted-foreground mb-1">
+              <Zap className="h-4 w-4 text-yellow-400" />
+              <span className="text-xs">當前連勝</span>
+            </div>
+            <p className="text-lg font-bold">{stats.current_streak}</p>
+          </Card>
+          <Card className="p-4 border-border/50">
+            <div className="flex items-center gap-2 text-muted-foreground mb-1">
+              <Flame className="h-4 w-4 text-orange-400" />
+              <span className="text-xs">最長連勝</span>
+            </div>
+            <p className="text-lg font-bold">{stats.best_streak}</p>
+          </Card>
+          <Card className="p-4 border-border/50">
+            <div className="flex items-center gap-2 text-muted-foreground mb-1">
+              <Target className="h-4 w-4 text-primary" />
+              <span className="text-xs">最常交易</span>
+            </div>
+            <p className="text-lg font-bold">{stats.favorite_instrument || "-"}</p>
+          </Card>
+        </div>
+      )}
+
       <Tabs defaultValue="open" className="w-full">
         <TabsList className="bg-secondary mb-6">
           <TabsTrigger value="open">
@@ -201,10 +264,12 @@ export default function PortfolioPage() {
                           ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/30"
                           : tx.type === "bet"
                           ? "bg-blue-500/20 text-blue-400 border-blue-500/30"
+                          : tx.type === "checkin"
+                          ? "bg-yellow-500/20 text-yellow-400 border-yellow-500/30"
                           : ""
                       }
                     >
-                      {tx.type === "bet" ? "下注" : tx.type === "payout" ? "派彩" : tx.type}
+                      {tx.type === "bet" ? "下注" : tx.type === "payout" ? "派彩" : tx.type === "checkin" ? "簽到" : tx.type}
                     </Badge>
                     {tx.side && (
                       <span

@@ -14,6 +14,7 @@ import {
 } from "@/lib/market-maker";
 import { formatChips } from "@/lib/constants";
 import { useUserProfile } from "@/lib/hooks";
+import { useToast } from "@/components/ui/toast-notification";
 
 interface BettingPanelProps {
   market: Market;
@@ -23,6 +24,7 @@ interface BettingPanelProps {
 export function BettingPanel({ market, onBetPlaced }: BettingPanelProps) {
   const { isSignedIn } = useUser();
   const { profile, refreshProfile } = useUserProfile();
+  const { showToast } = useToast();
   const [side, setSide] = useState<"yes" | "no">("yes");
   const [amount, setAmount] = useState("");
   const [loading, setLoading] = useState(false);
@@ -72,6 +74,12 @@ export function BettingPanel({ market, onBetPlaced }: BettingPanelProps) {
         return;
       }
 
+      const sideLabel = side === "yes" ? yesLabel : noLabel;
+      showToast(
+        "success",
+        `下注成功！${formatChips(betAmount)} 籌碼 → ${sideLabel}`,
+        `預估獎金：${formatChips(potentialPayout)} 籌碼`
+      );
       setAmount("");
       await refreshProfile();
       onBetPlaced();
