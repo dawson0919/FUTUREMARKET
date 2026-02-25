@@ -112,6 +112,7 @@ export default function InstrumentPage({
       const res = await fetch(`/api/markets/${selectedMarket.id}/bet`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({ side: betSide, amount }),
       });
       const data = await res.json();

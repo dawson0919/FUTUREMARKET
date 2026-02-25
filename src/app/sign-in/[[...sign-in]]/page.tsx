@@ -1,9 +1,12 @@
 import { SignIn } from "@clerk/nextjs";
+import { InAppBrowserGuard } from "@/components/auth/InAppBrowserGuard";
 
 export default function SignInPage() {
   return (
-    <div className="flex items-center justify-center py-20">
-      <SignIn forceRedirectUrl="/" />
-    </div>
+    <InAppBrowserGuard>
+      <div className="flex items-center justify-center py-20">
+        <SignIn forceRedirectUrl="/" />
+      </div>
+    </InAppBrowserGuard>
   );
 }

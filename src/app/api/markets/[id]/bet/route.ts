@@ -9,7 +9,7 @@ export async function POST(
 ) {
   const { userId } = await auth();
   if (!userId) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json({ error: "請先登入再下注" }, { status: 401 });
   }
 
   const { id: marketId } = await params;

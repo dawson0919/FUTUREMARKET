@@ -19,6 +19,7 @@ export function MarketCard({ market, currentPrice }: MarketCardProps) {
   const bettable = isMarketBettable(market.cutoff_time);
   const symbol = market.instrument?.symbol || "";
   const color = INSTRUMENT_COLORS[symbol] || "#7c3aed";
+  const isUpdown = market.strike_price === 0.01;
 
   const [timeLeft, setTimeLeft] = useState(getTimeRemaining(market.cutoff_time));
 
@@ -29,25 +30,31 @@ export function MarketCard({ market, currentPrice }: MarketCardProps) {
     return () => clearInterval(timer);
   }, [market.cutoff_time]);
 
+  const yesLabel = isUpdown ? "漲" : "Yes";
+  const noLabel = isUpdown ? "跌" : "No";
+
   const statusBadge = () => {
     if (market.status === "settled") {
       return (
         <Badge variant="secondary" className="text-xs">
-          {market.outcome === "yes" ? "Closed Above" : "Closed Below"}
+          {isUpdown
+            ? (market.outcome === "yes" ? "收漲" : "收跌")
+            : (market.outcome === "yes" ? "高於目標價" : "低於目標價")
+          }
         </Badge>
       );
     }
     if (!bettable) {
       return (
         <Badge variant="destructive" className="text-xs">
-          Betting Closed
+          已停止下注
         </Badge>
       );
     }
     return (
       <Badge className="text-xs bg-emerald-500/20 text-emerald-400 border-emerald-500/30">
         <span className="mr-1 h-1.5 w-1.5 rounded-full bg-emerald-400 inline-block animate-live-pulse" />
-        Live
+        交易中
       </Badge>
     );
   };
@@ -77,7 +84,7 @@ export function MarketCard({ market, currentPrice }: MarketCardProps) {
             </div>
             {currentPrice !== undefined && (
               <div className="text-right">
-                <div className="text-xs text-muted-foreground">Current</div>
+                <div className="text-xs text-muted-foreground">目前價格</div>
                 <div className="text-sm font-semibold">{formatPrice(currentPrice, symbol)}</div>
               </div>
             )}
@@ -89,8 +96,8 @@ export function MarketCard({ market, currentPrice }: MarketCardProps) {
           {/* Odds bar */}
           <div className="mb-3">
             <div className="flex justify-between text-xs mb-1.5">
-              <span className="text-emerald-400 font-semibold">Yes {yesPercent}%</span>
-              <span className="text-red-400 font-semibold">No {noPercent}%</span>
+              <span className="text-emerald-400 font-semibold">{yesLabel} {yesPercent}%</span>
+              <span className="text-red-400 font-semibold">{noLabel} {noPercent}%</span>
             </div>
             <div className="h-2 rounded-full bg-secondary overflow-hidden flex">
               <div
@@ -125,7 +132,7 @@ export function MarketCard({ market, currentPrice }: MarketCardProps) {
             {bettable && !timeLeft.expired && (
               <span className="flex items-center gap-1">
                 <Clock className="h-3 w-3" />
-                {timeLeft.hours}h {timeLeft.minutes}m
+                {timeLeft.hours}時{timeLeft.minutes}分
               </span>
             )}
           </div>

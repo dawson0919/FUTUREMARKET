@@ -79,6 +79,16 @@ export interface LeaderboardEntry {
   win_rate: number;
 }
 
+export interface PeriodicLeaderboardEntry {
+  id: string;
+  username: string | null;
+  avatar_url: string | null;
+  chips_balance: number;
+  period_profit: number;
+  period_trades: number;
+  period_wins: number;
+}
+
 export interface PriceData {
   symbol: string;
   price: number;

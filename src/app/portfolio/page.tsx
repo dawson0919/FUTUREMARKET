@@ -67,7 +67,7 @@ export default function PortfolioPage() {
   if (!isSignedIn) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
-        <p className="text-lg font-medium">Sign in to view your portfolio</p>
+        <p className="text-lg font-medium">請先登入以查看投資組合</p>
       </div>
     );
   }
@@ -89,7 +89,7 @@ export default function PortfolioPage() {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold mb-6">Portfolio</h1>
+      <h1 className="text-3xl font-bold mb-6">投資組合</h1>
 
       {/* Stats cards */}
       {profile && (
@@ -97,7 +97,7 @@ export default function PortfolioPage() {
           <Card className="p-4 border-border/50">
             <div className="flex items-center gap-2 text-muted-foreground mb-1">
               <Coins className="h-4 w-4 text-yellow-500" />
-              <span className="text-xs">Balance</span>
+              <span className="text-xs">餘額</span>
             </div>
             <p className="text-xl font-bold">{formatChips(profile.chips_balance)}</p>
           </Card>
@@ -108,7 +108,7 @@ export default function PortfolioPage() {
               ) : (
                 <TrendingDown className="h-4 w-4 text-red-400" />
               )}
-              <span className="text-xs">Total Profit</span>
+              <span className="text-xs">總盈虧</span>
             </div>
             <p
               className={`text-xl font-bold ${
@@ -122,14 +122,14 @@ export default function PortfolioPage() {
           <Card className="p-4 border-border/50">
             <div className="flex items-center gap-2 text-muted-foreground mb-1">
               <Award className="h-4 w-4 text-primary" />
-              <span className="text-xs">Win Rate</span>
+              <span className="text-xs">勝率</span>
             </div>
             <p className="text-xl font-bold">{winRate}%</p>
           </Card>
           <Card className="p-4 border-border/50">
             <div className="flex items-center gap-2 text-muted-foreground mb-1">
               <History className="h-4 w-4" />
-              <span className="text-xs">Total Trades</span>
+              <span className="text-xs">總交易筆數</span>
             </div>
             <p className="text-xl font-bold">{profile.total_trades}</p>
           </Card>
@@ -139,23 +139,23 @@ export default function PortfolioPage() {
       <Tabs defaultValue="open" className="w-full">
         <TabsList className="bg-secondary mb-6">
           <TabsTrigger value="open">
-            Open ({openPositions.length})
+            進行中 ({openPositions.length})
           </TabsTrigger>
           <TabsTrigger value="settled">
-            Settled ({settledPositions.length})
+            已結算 ({settledPositions.length})
           </TabsTrigger>
-          <TabsTrigger value="history">History</TabsTrigger>
+          <TabsTrigger value="history">交易紀錄</TabsTrigger>
         </TabsList>
 
         <TabsContent value="open">
           {openPositions.length === 0 ? (
             <Card className="p-8 text-center border-border/50">
-              <p className="text-muted-foreground">No open positions</p>
+              <p className="text-muted-foreground">目前沒有進行中的持倉</p>
               <Link
                 href="/"
                 className="text-primary text-sm mt-2 inline-block hover:underline"
               >
-                Browse markets
+                瀏覽市場
               </Link>
             </Card>
           ) : (
@@ -170,7 +170,7 @@ export default function PortfolioPage() {
         <TabsContent value="settled">
           {settledPositions.length === 0 ? (
             <Card className="p-8 text-center border-border/50">
-              <p className="text-muted-foreground">No settled positions yet</p>
+              <p className="text-muted-foreground">還沒有已結算的持倉</p>
             </Card>
           ) : (
             <div className="space-y-3">
@@ -184,7 +184,7 @@ export default function PortfolioPage() {
         <TabsContent value="history">
           {transactions.length === 0 ? (
             <Card className="p-8 text-center border-border/50">
-              <p className="text-muted-foreground">No transactions yet</p>
+              <p className="text-muted-foreground">還沒有交易紀錄</p>
             </Card>
           ) : (
             <Card className="border-border/50 overflow-hidden">
@@ -204,7 +204,7 @@ export default function PortfolioPage() {
                           : ""
                       }
                     >
-                      {tx.type}
+                      {tx.type === "bet" ? "下注" : tx.type === "payout" ? "派彩" : tx.type}
                     </Badge>
                     {tx.side && (
                       <span
@@ -270,7 +270,7 @@ function PositionCard({ position: pos }: { position: PositionWithMarket }) {
                 </Badge>
                 {pos.settled && (
                   <Badge variant="secondary" className="text-[10px]">
-                    Settled
+                    已結算
                   </Badge>
                 )}
               </div>
@@ -278,7 +278,7 @@ function PositionCard({ position: pos }: { position: PositionWithMarket }) {
             </div>
           </div>
           <div className="text-right flex-shrink-0 ml-4">
-            <div className="text-sm font-semibold">{formatChips(pos.amount)} chips</div>
+            <div className="text-sm font-semibold">{formatChips(pos.amount)} 籌碼</div>
             {profit !== null ? (
               <div
                 className={`text-xs font-medium ${
@@ -290,7 +290,7 @@ function PositionCard({ position: pos }: { position: PositionWithMarket }) {
               </div>
             ) : (
               <div className="text-xs text-muted-foreground">
-                Est: {formatChips(pos.potential_payout)}
+                預估：{formatChips(pos.potential_payout)}
               </div>
             )}
           </div>

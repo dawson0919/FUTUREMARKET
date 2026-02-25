@@ -6,6 +6,7 @@ import { TrendingUp, ChevronRight } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { UpDownCard } from "@/components/market/UpDownCard";
+import { TopWinnersCard } from "@/components/leaderboard/TopWinnersCard";
 import { usePrices } from "@/lib/hooks";
 import { supabase } from "@/lib/supabase";
 import { INSTRUMENTS, formatPrice, formatChips, INSTRUMENT_COLORS } from "@/lib/constants";
@@ -151,7 +152,7 @@ export default function HomePage() {
         <p className="text-muted-foreground mb-4">
           預測期貨與加密貨幣的每日收盤價，用免費籌碼下注，登上排行榜！
         </p>
-        <div className="flex flex-wrap gap-3 text-xs">
+        <div className="flex flex-wrap gap-3 text-xs mb-4">
           <div className="flex items-center gap-1.5 bg-secondary rounded-lg px-3 py-1.5">
             <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
             <span className="text-muted-foreground">加密貨幣收盤：</span>
@@ -165,7 +166,28 @@ export default function HomePage() {
             <span className="text-muted-foreground">· 03:00 停止下注</span>
           </div>
         </div>
+
+        {/* 賠率說明 */}
+        <div className="rounded-xl bg-secondary/60 border border-border/40 p-4 text-xs text-muted-foreground leading-relaxed">
+          <p className="text-foreground font-semibold text-sm mb-2">派彩機制：機率越高，賠率越低</p>
+          <p className="mb-2">
+            本平台採用 <span className="text-foreground font-medium">Parimutuel（同池分彩）</span> 機制，所有下注籌碼匯入同一獎池，預測正確的一方按下注比例瓜分整個獎池。
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-3">
+            <div className="rounded-lg bg-emerald-500/5 border border-emerald-500/15 px-3 py-2">
+              <span className="text-emerald-400 font-semibold">高機率（如 95%）→ 低賠率 ≈ 1.05x</span>
+              <p className="mt-0.5">風險低，幾乎穩贏但賺得少</p>
+            </div>
+            <div className="rounded-lg bg-red-500/5 border border-red-500/15 px-3 py-2">
+              <span className="text-red-400 font-semibold">低機率（如 5%）→ 高賠率 ≈ 20x</span>
+              <p className="mt-0.5">風險高，可能大賺但很容易輸</p>
+            </div>
+          </div>
+        </div>
       </div>
+
+      {/* Top Winners Card */}
+      <TopWinnersCard />
 
       {/* Filters */}
       <div className="flex items-center gap-2 mb-6">

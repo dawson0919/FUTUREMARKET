@@ -46,11 +46,11 @@ export function BettingPanel({ market, onBetPlaced }: BettingPanelProps) {
 
   async function handleBet() {
     if (!betAmount || betAmount <= 0) {
-      setError("Please enter a valid amount");
+      setError("請輸入有效的下注金額");
       return;
     }
     if (profile && betAmount > profile.chips_balance) {
-      setError("Insufficient chips");
+      setError("籌碼不足");
       return;
     }
 
@@ -61,13 +61,14 @@ export function BettingPanel({ market, onBetPlaced }: BettingPanelProps) {
       const res = await fetch(`/api/markets/${market.id}/bet`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({ side, amount: betAmount }),
       });
 
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.error || "Failed to place bet");
+        setError(data.error || "下注失敗");
         return;
       }
 
@@ -75,7 +76,7 @@ export function BettingPanel({ market, onBetPlaced }: BettingPanelProps) {
       await refreshProfile();
       onBetPlaced();
     } catch {
-      setError("Failed to place bet");
+      setError("下注失敗");
     } finally {
       setLoading(false);
     }
@@ -90,8 +91,8 @@ export function BettingPanel({ market, onBetPlaced }: BettingPanelProps) {
           <Lock className="h-8 w-8" />
           <p className="font-medium">
             {market.status === "settled"
-              ? "This market has been settled"
-              : "Betting is closed for this market"}
+              ? "此市場已結算"
+              : "此市場已停止下注"}
           </p>
         </div>
       </Card>
@@ -102,7 +103,7 @@ export function BettingPanel({ market, onBetPlaced }: BettingPanelProps) {
     return (
       <Card className="p-6 border-border/50">
         <div className="flex flex-col items-center gap-3 py-4 text-muted-foreground">
-          <p className="font-medium">Sign in to place bets</p>
+          <p className="font-medium">請先登入再下注</p>
         </div>
       </Card>
     );
@@ -110,12 +111,12 @@ export function BettingPanel({ market, onBetPlaced }: BettingPanelProps) {
 
   return (
     <Card className="p-6 border-border/50">
-      <h3 className="font-semibold mb-4">Place Your Bet</h3>
+      <h3 className="font-semibold mb-4">下注</h3>
 
       {/* Balance */}
       {profile && (
         <div className="text-sm text-muted-foreground mb-4">
-          Balance: <span className="font-semibold text-foreground">{formatChips(profile.chips_balance)}</span> chips
+          餘額：<span className="font-semibold text-foreground">{formatChips(profile.chips_balance)}</span> 籌碼
         </div>
       )}
 
@@ -147,7 +148,7 @@ export function BettingPanel({ market, onBetPlaced }: BettingPanelProps) {
       <div className="mb-3">
         <Input
           type="number"
-          placeholder="Enter amount..."
+          placeholder="輸入下注金額..."
           value={amount}
           onChange={(e) => {
             setAmount(e.target.value);
@@ -174,13 +175,13 @@ export function BettingPanel({ market, onBetPlaced }: BettingPanelProps) {
       {betAmount > 0 && (
         <div className="bg-secondary rounded-lg p-3 mb-4 space-y-1.5">
           <div className="flex justify-between text-sm">
-            <span className="text-muted-foreground">Potential Payout</span>
+            <span className="text-muted-foreground">預估獎金</span>
             <span className="font-semibold text-emerald-400">
-              {formatChips(potentialPayout)} chips
+              {formatChips(potentialPayout)} 籌碼
             </span>
           </div>
           <div className="flex justify-between text-sm">
-            <span className="text-muted-foreground">Multiplier</span>
+            <span className="text-muted-foreground">賠率</span>
             <span className="font-semibold">{multiplier}x</span>
           </div>
         </div>

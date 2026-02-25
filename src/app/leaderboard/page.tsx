@@ -1,30 +1,86 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Trophy, Medal, TrendingUp, Target } from "lucide-react";
+import { useEffect, useState, useCallback } from "react";
+import { Trophy, Medal } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import type { LeaderboardEntry } from "@/types";
+import type { LeaderboardEntry, PeriodicLeaderboardEntry } from "@/types";
 import { formatChips } from "@/lib/constants";
 
+type Period = "all" | "week" | "month";
+
+const PERIOD_LABELS: Record<Period, string> = {
+  all: "全部時間",
+  week: "本週",
+  month: "本月",
+};
+
+// Unified entry shape for rendering
+interface DisplayEntry {
+  id: string;
+  username: string | null;
+  avatar_url: string | null;
+  chips_balance: number;
+  profit: number;
+  trades: number;
+  win_rate: number;
+}
+
 export default function LeaderboardPage() {
-  const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
+  const [period, setPeriod] = useState<Period>("all");
+  const [displayEntries, setDisplayEntries] = useState<DisplayEntry[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    async function fetchLeaderboard() {
-      try {
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    try {
+      if (period === "all") {
         const res = await fetch("/api/leaderboard");
         const data = await res.json();
-        if (data.leaderboard) setEntries(data.leaderboard);
-      } catch {
-        console.error("Failed to fetch leaderboard");
-      } finally {
-        setLoading(false);
+        if (data.leaderboard) {
+          setDisplayEntries(
+            (data.leaderboard as LeaderboardEntry[]).map((e) => ({
+              id: e.id,
+              username: e.username,
+              avatar_url: e.avatar_url,
+              chips_balance: e.chips_balance,
+              profit: e.total_profit,
+              trades: e.total_trades,
+              win_rate: e.win_rate,
+            }))
+          );
+        }
+      } else {
+        const res = await fetch(`/api/leaderboard/periodic?period=${period}`);
+        const data = await res.json();
+        if (data.leaderboard) {
+          setDisplayEntries(
+            (data.leaderboard as PeriodicLeaderboardEntry[]).map((e) => ({
+              id: e.id,
+              username: e.username,
+              avatar_url: e.avatar_url,
+              chips_balance: e.chips_balance,
+              profit: e.period_profit,
+              trades: e.period_trades,
+              win_rate: e.period_trades > 0
+                ? Math.round((e.period_wins / e.period_trades) * 100)
+                : 0,
+            }))
+          );
+        } else {
+          setDisplayEntries([]);
+        }
       }
+    } catch {
+      console.error("Failed to fetch leaderboard");
+    } finally {
+      setLoading(false);
     }
-    fetchLeaderboard();
-  }, []);
+  }, [period]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   const getRankIcon = (index: number) => {
     switch (index) {
@@ -43,123 +99,150 @@ export default function LeaderboardPage() {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center py-20">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-      </div>
-    );
-  }
-
   return (
     <div>
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">Leaderboard</h1>
-        <p className="text-muted-foreground">
-          Top players ranked by total profit. Compete and climb!
-        </p>
+      <div className="flex items-start justify-between mb-8">
+        <div>
+          <h1 className="text-3xl font-bold mb-2">排行榜</h1>
+          <p className="text-muted-foreground">
+            {period === "all"
+              ? "依據總盈虧排名，展現你的預測實力！"
+              : period === "week"
+              ? "本週獲利排名，每週一重置"
+              : "本月獲利排名，每月1日重置"}
+          </p>
+        </div>
+
+        {/* Period tabs */}
+        <div className="flex gap-1 bg-secondary rounded-lg p-1">
+          {(["all", "week", "month"] as Period[]).map((p) => (
+            <button
+              key={p}
+              onClick={() => setPeriod(p)}
+              className={`px-4 py-2 rounded-md text-sm font-semibold transition-colors ${
+                period === p
+                  ? "bg-primary text-primary-foreground"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              {PERIOD_LABELS[p]}
+            </button>
+          ))}
+        </div>
       </div>
 
-      {/* Top 3 podium */}
-      {entries.length >= 3 && (
-        <div className="grid grid-cols-3 gap-4 mb-8">
-          {[1, 0, 2].map((idx) => {
-            const entry = entries[idx];
-            if (!entry) return null;
-            const isFirst = idx === 0;
-            return (
-              <Card
-                key={entry.id}
-                className={`p-6 text-center border-border/50 ${
-                  isFirst ? "ring-2 ring-yellow-500/30 bg-yellow-500/5" : ""
-                } ${idx === 0 ? "order-2" : idx === 1 ? "order-1 mt-4" : "order-3 mt-4"}`}
-              >
-                <div className="flex flex-col items-center gap-3">
-                  <div className="relative">
-                    <Avatar className="h-16 w-16">
+      {loading ? (
+        <div className="flex items-center justify-center py-20">
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+        </div>
+      ) : (
+        <>
+          {/* Top 3 podium */}
+          {displayEntries.length >= 3 && (
+            <div className="grid grid-cols-3 gap-4 mb-8">
+              {[1, 0, 2].map((idx) => {
+                const entry = displayEntries[idx];
+                if (!entry) return null;
+                const isFirst = idx === 0;
+                return (
+                  <Card
+                    key={entry.id}
+                    className={`p-6 text-center border-border/50 ${
+                      isFirst ? "ring-2 ring-yellow-500/30 bg-yellow-500/5" : ""
+                    } ${idx === 0 ? "order-2" : idx === 1 ? "order-1 mt-4" : "order-3 mt-4"}`}
+                  >
+                    <div className="flex flex-col items-center gap-3">
+                      <div className="relative">
+                        <Avatar className="h-16 w-16">
+                          <AvatarImage src={entry.avatar_url || ""} />
+                          <AvatarFallback className="bg-primary/20 text-primary text-lg">
+                            {(entry.username || "?")[0]?.toUpperCase()}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="absolute -top-1 -right-1">{getRankIcon(idx)}</div>
+                      </div>
+                      <div>
+                        <p className="font-semibold text-sm truncate max-w-[120px]">
+                          {entry.username || "匿名"}
+                        </p>
+                        <p
+                          className={`text-lg font-bold ${
+                            entry.profit >= 0 ? "text-emerald-400" : "text-red-400"
+                          }`}
+                        >
+                          {entry.profit >= 0 ? "+" : ""}
+                          {formatChips(entry.profit)}
+                        </p>
+                      </div>
+                      <div className="flex gap-3 text-xs text-muted-foreground">
+                        <span>{entry.trades} 筆交易</span>
+                        <span>勝率 {entry.win_rate}%</span>
+                      </div>
+                    </div>
+                  </Card>
+                );
+              })}
+            </div>
+          )}
+
+          {/* Full list */}
+          <Card className="border-border/50 overflow-hidden">
+            <div className="grid grid-cols-[60px_1fr_120px_100px_80px] gap-4 px-6 py-3 bg-secondary text-xs font-medium text-muted-foreground">
+              <span>排名</span>
+              <span>玩家</span>
+              <span className="text-right">
+                {period === "all" ? "總盈虧" : `${PERIOD_LABELS[period]}盈虧`}
+              </span>
+              <span className="text-right">餘額</span>
+              <span className="text-right">勝率</span>
+            </div>
+            {displayEntries.length === 0 ? (
+              <div className="py-12 text-center text-muted-foreground">
+                {period === "all"
+                  ? "還沒有玩家，成為第一個吧！"
+                  : `${PERIOD_LABELS[period]}還沒有交易紀錄`}
+              </div>
+            ) : (
+              displayEntries.map((entry, i) => (
+                <div
+                  key={entry.id}
+                  className="grid grid-cols-[60px_1fr_120px_100px_80px] gap-4 px-6 py-3 items-center border-t border-border/30 hover:bg-accent/30 transition-colors"
+                >
+                  <div className="flex items-center justify-center">{getRankIcon(i)}</div>
+                  <div className="flex items-center gap-3 min-w-0">
+                    <Avatar className="h-8 w-8 flex-shrink-0">
                       <AvatarImage src={entry.avatar_url || ""} />
-                      <AvatarFallback className="bg-primary/20 text-primary text-lg">
+                      <AvatarFallback className="bg-primary/20 text-primary text-xs">
                         {(entry.username || "?")[0]?.toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
-                    <div className="absolute -top-1 -right-1">{getRankIcon(idx)}</div>
+                    <div className="min-w-0">
+                      <p className="font-medium text-sm truncate">
+                        {entry.username || "匿名"}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {entry.trades} 筆交易
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="font-semibold text-sm truncate max-w-[120px]">
-                      {entry.username || "Anonymous"}
-                    </p>
-                    <p
-                      className={`text-lg font-bold ${
-                        entry.total_profit >= 0 ? "text-emerald-400" : "text-red-400"
+                  <div className="text-right">
+                    <span
+                      className={`text-sm font-semibold ${
+                        entry.profit >= 0 ? "text-emerald-400" : "text-red-400"
                       }`}
                     >
-                      {entry.total_profit >= 0 ? "+" : ""}
-                      {formatChips(entry.total_profit)}
-                    </p>
+                      {entry.profit >= 0 ? "+" : ""}
+                      {formatChips(entry.profit)}
+                    </span>
                   </div>
-                  <div className="flex gap-3 text-xs text-muted-foreground">
-                    <span>{entry.total_trades} trades</span>
-                    <span>{entry.win_rate}% win</span>
-                  </div>
+                  <div className="text-right text-sm">{formatChips(entry.chips_balance)}</div>
+                  <div className="text-right text-sm">{entry.win_rate}%</div>
                 </div>
-              </Card>
-            );
-          })}
-        </div>
+              ))
+            )}
+          </Card>
+        </>
       )}
-
-      {/* Full list */}
-      <Card className="border-border/50 overflow-hidden">
-        <div className="grid grid-cols-[60px_1fr_120px_100px_80px] gap-4 px-6 py-3 bg-secondary text-xs font-medium text-muted-foreground">
-          <span>Rank</span>
-          <span>Player</span>
-          <span className="text-right">Profit</span>
-          <span className="text-right">Balance</span>
-          <span className="text-right">Win%</span>
-        </div>
-        {entries.length === 0 ? (
-          <div className="py-12 text-center text-muted-foreground">
-            No players yet. Be the first!
-          </div>
-        ) : (
-          entries.map((entry, i) => (
-            <div
-              key={entry.id}
-              className="grid grid-cols-[60px_1fr_120px_100px_80px] gap-4 px-6 py-3 items-center border-t border-border/30 hover:bg-accent/30 transition-colors"
-            >
-              <div className="flex items-center justify-center">{getRankIcon(i)}</div>
-              <div className="flex items-center gap-3 min-w-0">
-                <Avatar className="h-8 w-8 flex-shrink-0">
-                  <AvatarImage src={entry.avatar_url || ""} />
-                  <AvatarFallback className="bg-primary/20 text-primary text-xs">
-                    {(entry.username || "?")[0]?.toUpperCase()}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="min-w-0">
-                  <p className="font-medium text-sm truncate">
-                    {entry.username || "Anonymous"}
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    {entry.total_trades} trades
-                  </p>
-                </div>
-              </div>
-              <div className="text-right">
-                <span
-                  className={`text-sm font-semibold ${
-                    entry.total_profit >= 0 ? "text-emerald-400" : "text-red-400"
-                  }`}
-                >
-                  {entry.total_profit >= 0 ? "+" : ""}
-                  {formatChips(entry.total_profit)}
-                </span>
-              </div>
-              <div className="text-right text-sm">{formatChips(entry.chips_balance)}</div>
-              <div className="text-right text-sm">{entry.win_rate}%</div>
-            </div>
-          ))
-        )}
-      </Card>
     </div>
   );
 }

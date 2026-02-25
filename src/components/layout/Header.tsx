@@ -11,9 +11,9 @@ import { formatChips } from "@/lib/constants";
 import { useUserProfile } from "@/lib/hooks";
 
 const navItems = [
-  { href: "/", label: "Markets", icon: TrendingUp },
-  { href: "/leaderboard", label: "Leaderboard", icon: Trophy },
-  { href: "/portfolio", label: "Portfolio", icon: Briefcase },
+  { href: "/", label: "市場", icon: TrendingUp },
+  { href: "/leaderboard", label: "排行榜", icon: Trophy },
+  { href: "/portfolio", label: "投資組合", icon: Briefcase },
 ];
 
 export function Header() {
@@ -81,7 +81,7 @@ export function Header() {
               </SignedIn>
               <SignedOut>
                 <Link href="/sign-in">
-                  <Button size="sm">Sign In</Button>
+                  <Button size="sm">登入</Button>
                 </Link>
               </SignedOut>
             </>

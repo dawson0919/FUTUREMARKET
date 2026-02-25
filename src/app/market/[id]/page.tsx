@@ -71,7 +71,7 @@ export default function MarketPage({ params }: { params: Promise<{ id: string }>
         className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-6 transition-colors"
       >
         <ArrowLeft className="h-4 w-4" />
-        Back to Markets
+        返回市場
       </Link>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -105,7 +105,7 @@ export default function MarketPage({ params }: { params: Promise<{ id: string }>
                     : ""
                 }
               >
-                {market.status === "open" ? "Open" : market.status === "closed" ? "Closed" : "Settled"}
+                {market.status === "open" ? "交易中" : market.status === "closed" ? "已關閉" : "已結算"}
               </Badge>
             </div>
 
@@ -113,7 +113,7 @@ export default function MarketPage({ params }: { params: Promise<{ id: string }>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
               <div className="bg-secondary rounded-lg p-3">
                 <div className="text-xs text-muted-foreground mb-1">
-                  {isUpdown ? "開盤參考價" : "Strike Price"}
+                  {isUpdown ? "開盤參考價" : "目標價格"}
                 </div>
                 <div className="font-semibold">
                   {isUpdown ? formatPrice(refPrice, symbol) : formatPrice(market.strike_price, symbol)}
@@ -126,14 +126,14 @@ export default function MarketPage({ params }: { params: Promise<{ id: string }>
                 </div>
               )}
               <div className="bg-secondary rounded-lg p-3">
-                <div className="text-xs text-muted-foreground mb-1">Volume</div>
+                <div className="text-xs text-muted-foreground mb-1">交易量</div>
                 <div className="font-semibold flex items-center gap-1">
                   <TrendingUp className="h-3.5 w-3.5" />
                   {formatChips(market.total_volume)}
                 </div>
               </div>
               <div className="bg-secondary rounded-lg p-3">
-                <div className="text-xs text-muted-foreground mb-1">Players</div>
+                <div className="text-xs text-muted-foreground mb-1">參與人數</div>
                 <div className="font-semibold flex items-center gap-1">
                   <Users className="h-3.5 w-3.5" />
                   {market.participant_count}
@@ -147,14 +147,14 @@ export default function MarketPage({ params }: { params: Promise<{ id: string }>
                 <div className="text-sm text-emerald-400 mb-1">{isUpdown ? "漲 Up" : "Yes"}</div>
                 <div className="text-3xl font-bold text-emerald-400">{yesPercent}%</div>
                 <div className="text-xs text-muted-foreground mt-1">
-                  Pool: {formatChips(market.yes_pool)}
+                  獎池：{formatChips(market.yes_pool)}
                 </div>
               </div>
               <div className="rounded-xl bg-red-500/10 border border-red-500/20 p-4 text-center">
                 <div className="text-sm text-red-400 mb-1">{isUpdown ? "跌 Down" : "No"}</div>
                 <div className="text-3xl font-bold text-red-400">{noPercent}%</div>
                 <div className="text-xs text-muted-foreground mt-1">
-                  Pool: {formatChips(market.no_pool)}
+                  獎池：{formatChips(market.no_pool)}
                 </div>
               </div>
             </div>
@@ -168,7 +168,7 @@ export default function MarketPage({ params }: { params: Promise<{ id: string }>
                     : "bg-red-500/10 border border-red-500/30"
                 }`}
               >
-                <div className="text-sm text-muted-foreground mb-1">Result</div>
+                <div className="text-sm text-muted-foreground mb-1">結算結果</div>
                 <div
                   className={`text-lg font-bold ${
                     market.outcome === "yes" ? "text-emerald-400" : "text-red-400"
@@ -188,7 +188,7 @@ export default function MarketPage({ params }: { params: Promise<{ id: string }>
           {/* Your positions */}
           {positions.length > 0 && (
             <Card className="p-6 border-border/50">
-              <h3 className="font-semibold mb-4">Your Positions</h3>
+              <h3 className="font-semibold mb-4">我的持倉</h3>
               <div className="space-y-3">
                 {positions.map((pos) => (
                   <div
@@ -207,7 +207,7 @@ export default function MarketPage({ params }: { params: Promise<{ id: string }>
                       </span>
                       <div>
                         <div className="text-sm font-medium">
-                          {formatChips(pos.amount)} chips
+                          {formatChips(pos.amount)} 籌碼
                         </div>
                         <div className="text-xs text-muted-foreground">
                           {new Date(pos.created_at).toLocaleString()}
@@ -226,7 +226,7 @@ export default function MarketPage({ params }: { params: Promise<{ id: string }>
                         </span>
                       ) : (
                         <span className="text-sm text-muted-foreground">
-                          Est. payout: {formatChips(pos.potential_payout)}
+                          預估獎金：{formatChips(pos.potential_payout)}
                         </span>
                       )}
                     </div>
@@ -257,7 +257,10 @@ export default function MarketPage({ params }: { params: Promise<{ id: string }>
               如何參與
             </h4>
             <ol className="text-xs text-muted-foreground space-y-2 list-decimal list-inside">
-              <li>選擇 <span className="text-emerald-400 font-medium">Yes</span> 或 <span className="text-red-400 font-medium">No</span> 方向</li>
+              <li>選擇{isUpdown
+                ? <> <span className="text-emerald-400 font-medium">漲 Up</span> 或 <span className="text-red-400 font-medium">跌 Down</span></>
+                : <> <span className="text-emerald-400 font-medium">Yes</span> 或 <span className="text-red-400 font-medium">No</span></>
+              } 方向</li>
               <li>輸入下注籌碼數量</li>
               <li>確認下注，等待收盤結算</li>
               <li>預測正確即可瓜分獎池</li>
