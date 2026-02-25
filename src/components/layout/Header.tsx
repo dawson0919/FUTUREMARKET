@@ -29,11 +29,14 @@ export function Header() {
     <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-xl">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground font-bold text-sm">
-            FM
+        <Link href="/" className="flex items-center gap-2.5">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-[#6d5dfc] to-[#4338ca] shadow-lg shadow-[#6d5dfc]/20">
+            <svg width="20" height="20" viewBox="0 0 48 48" fill="none">
+              <path d="M8 36L18 26L26 32L40 14" stroke="#4ade80" strokeWidth="4.5" strokeLinecap="round" strokeLinejoin="round" />
+              <path d="M34 12L42 13L41 21" stroke="#4ade80" strokeWidth="4.5" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
           </div>
-          <span className="text-lg font-bold">FutureMarket</span>
+          <span className="text-lg font-bold tracking-tight">FUTUREMARKET</span>
         </Link>
 
         {/* Navigation */}

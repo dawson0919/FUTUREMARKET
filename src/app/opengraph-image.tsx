@@ -49,52 +49,81 @@ export default async function Image() {
           }}
         />
 
-        {/* Logo */}
+        {/* Logo icon + text */}
         <div
           style={{
             display: "flex",
             alignItems: "center",
-            gap: "16px",
-            marginBottom: "32px",
+            gap: "20px",
+            marginBottom: "36px",
           }}
         >
           <div
             style={{
-              background: "#6d5dfc",
-              borderRadius: "16px",
-              width: "64px",
-              height: "64px",
+              width: "80px",
+              height: "80px",
+              borderRadius: "20px",
+              background: "linear-gradient(135deg, #6d5dfc, #4338ca)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              fontSize: "28px",
-              fontWeight: 900,
-              color: "white",
+              boxShadow: "0 8px 32px rgba(109,93,252,0.4)",
             }}
           >
-            FM
+            <svg width="48" height="48" viewBox="0 0 48 48">
+              <path
+                d="M8 36L18 26L26 32L40 14"
+                stroke="#4ade80"
+                strokeWidth="4"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                fill="none"
+              />
+              <path
+                d="M34 12L42 13L41 21"
+                stroke="#4ade80"
+                strokeWidth="4"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                fill="none"
+              />
+            </svg>
           </div>
-          <span
-            style={{
-              fontSize: "42px",
-              fontWeight: 800,
-              color: "white",
-              letterSpacing: "-1px",
-            }}
-          >
-            FutureMarket
-          </span>
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            <span
+              style={{
+                fontSize: "52px",
+                fontWeight: 900,
+                color: "white",
+                letterSpacing: "-2px",
+                lineHeight: 1,
+              }}
+            >
+              FUTUREMARKET
+            </span>
+            <span
+              style={{
+                fontSize: "18px",
+                fontWeight: 500,
+                color: "#6d5dfc",
+                letterSpacing: "4px",
+                marginTop: "4px",
+              }}
+            >
+              PREDICTION MARKET
+            </span>
+          </div>
         </div>
 
         {/* Title */}
         <div
           style={{
-            fontSize: "56px",
+            fontSize: "48px",
             fontWeight: 800,
             color: "white",
-            marginBottom: "20px",
+            marginBottom: "16px",
             textAlign: "center",
-            lineHeight: 1.2,
+            lineHeight: 1.3,
             display: "flex",
           }}
         >
@@ -104,7 +133,7 @@ export default async function Image() {
         {/* Subtitle */}
         <div
           style={{
-            fontSize: "26px",
+            fontSize: "24px",
             color: "#888",
             marginBottom: "48px",
             textAlign: "center",
