@@ -78,19 +78,31 @@ export async function POST(request: Request) {
       createdUpdown.push(inst.symbol);
     }
 
-    // === 2. Create strike price level markets ===
+    // === 2. Create strike price level markets with fair initial odds ===
     const strikePrices = generateStrikeLevels(priceData.price, inst.symbol);
+    const config = STRIKE_CONFIG[inst.symbol] || { step: 100, count: 5 };
+    const basePrice = roundToStep(priceData.price, config.step);
 
-    const marketsToInsert = strikePrices.map((strike) => ({
-      instrument_id: inst.id,
-      title: `${inst.symbol} 收盤價高於 ${formatStrikePrice(strike, inst.symbol)}？`,
-      description: `預測 ${inst.name} 是否會在收盤時高於 ${formatStrikePrice(strike, inst.symbol)}`,
-      strike_price: strike,
-      status: "open" as const,
-      market_date: today,
-      close_time: closeTime.toISOString(),
-      cutoff_time: cutoffTime.toISOString(),
-    }));
+    const marketsToInsert = strikePrices.map((strike) => {
+      // Calculate initial probability based on distance from current price
+      // Steps above current → lower yes probability, steps below → higher
+      const stepsFromCenter = (strike - basePrice) / config.step;
+      const yesProb = Math.max(0.05, Math.min(0.95, 0.5 - stepsFromCenter * 0.09));
+      const SEED = 10000;
+
+      return {
+        instrument_id: inst.id,
+        title: `${inst.symbol} 收盤價高於 ${formatStrikePrice(strike, inst.symbol)}？`,
+        description: `預測 ${inst.name} 是否會在收盤時高於 ${formatStrikePrice(strike, inst.symbol)}`,
+        strike_price: strike,
+        yes_pool: Math.round(SEED * yesProb),
+        no_pool: Math.round(SEED * (1 - yesProb)),
+        status: "open" as const,
+        market_date: today,
+        close_time: closeTime.toISOString(),
+        cutoff_time: cutoffTime.toISOString(),
+      };
+    });
 
     const { error } = await db.from("markets").upsert(marketsToInsert, {
       onConflict: "instrument_id,market_date,strike_price",
