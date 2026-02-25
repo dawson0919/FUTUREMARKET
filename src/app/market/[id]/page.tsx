@@ -58,6 +58,11 @@ export default function MarketPage({ params }: { params: Promise<{ id: string }>
   const { yesPercent, noPercent } = calculateOdds(market.yes_pool, market.no_pool);
   const currentPrice = prices[symbol]?.price;
 
+  // Detect up/down market
+  const isUpdown = market.strike_price === 0.01;
+  const refMatch = isUpdown ? market.description?.match(/ref:([\d.]+)/) : null;
+  const refPrice = refMatch ? parseFloat(refMatch[1]) : 0;
+
   return (
     <div>
       {/* Back nav */}
@@ -107,12 +112,16 @@ export default function MarketPage({ params }: { params: Promise<{ id: string }>
             {/* Price info */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
               <div className="bg-secondary rounded-lg p-3">
-                <div className="text-xs text-muted-foreground mb-1">Strike Price</div>
-                <div className="font-semibold">{formatPrice(market.strike_price, symbol)}</div>
+                <div className="text-xs text-muted-foreground mb-1">
+                  {isUpdown ? "開盤參考價" : "Strike Price"}
+                </div>
+                <div className="font-semibold">
+                  {isUpdown ? formatPrice(refPrice, symbol) : formatPrice(market.strike_price, symbol)}
+                </div>
               </div>
               {currentPrice !== undefined && (
                 <div className="bg-secondary rounded-lg p-3">
-                  <div className="text-xs text-muted-foreground mb-1">Current Price</div>
+                  <div className="text-xs text-muted-foreground mb-1">目前價格</div>
                   <div className="font-semibold">{formatPrice(currentPrice, symbol)}</div>
                 </div>
               )}
@@ -135,14 +144,14 @@ export default function MarketPage({ params }: { params: Promise<{ id: string }>
             {/* Big odds display */}
             <div className="grid grid-cols-2 gap-4 mb-6">
               <div className="rounded-xl bg-emerald-500/10 border border-emerald-500/20 p-4 text-center">
-                <div className="text-sm text-emerald-400 mb-1">Yes</div>
+                <div className="text-sm text-emerald-400 mb-1">{isUpdown ? "漲 Up" : "Yes"}</div>
                 <div className="text-3xl font-bold text-emerald-400">{yesPercent}%</div>
                 <div className="text-xs text-muted-foreground mt-1">
                   Pool: {formatChips(market.yes_pool)}
                 </div>
               </div>
               <div className="rounded-xl bg-red-500/10 border border-red-500/20 p-4 text-center">
-                <div className="text-sm text-red-400 mb-1">No</div>
+                <div className="text-sm text-red-400 mb-1">{isUpdown ? "跌 Down" : "No"}</div>
                 <div className="text-3xl font-bold text-red-400">{noPercent}%</div>
                 <div className="text-xs text-muted-foreground mt-1">
                   Pool: {formatChips(market.no_pool)}
@@ -165,9 +174,12 @@ export default function MarketPage({ params }: { params: Promise<{ id: string }>
                     market.outcome === "yes" ? "text-emerald-400" : "text-red-400"
                   }`}
                 >
-                  Closed at {market.closing_price ? formatPrice(market.closing_price, symbol) : "N/A"}
-                  {" - "}
-                  {market.outcome === "yes" ? "Above Strike" : "Below Strike"}
+                  收盤價 {market.closing_price ? formatPrice(market.closing_price, symbol) : "N/A"}
+                  {" — "}
+                  {isUpdown
+                    ? (market.outcome === "yes" ? "漲 ↑" : "跌 ↓")
+                    : (market.outcome === "yes" ? "高於目標價" : "低於目標價")
+                  }
                 </div>
               </div>
             )}
@@ -225,7 +237,7 @@ export default function MarketPage({ params }: { params: Promise<{ id: string }>
           )}
 
           {/* Rules & Resolution */}
-          <MarketRules symbol={symbol} instrumentType={market.instrument?.type || "crypto"} strikePrice={market.strike_price} />
+          <MarketRules symbol={symbol} instrumentType={market.instrument?.type || "crypto"} strikePrice={market.strike_price} isUpdown={isUpdown} refPrice={refPrice} />
         </div>
 
         {/* Sidebar */}
@@ -261,16 +273,19 @@ function MarketRules({
   symbol,
   instrumentType,
   strikePrice,
+  isUpdown,
+  refPrice,
 }: {
   symbol: string;
   instrumentType: string;
   strikePrice: number;
+  isUpdown: boolean;
+  refPrice: number;
 }) {
   const isCrypto = instrumentType === "crypto";
 
-  const priceSource = isCrypto
-    ? { name: "Crypto.com", pair: `${symbol}_USDT`, url: "https://crypto.com/exchange" }
-    : { name: "Yahoo Finance", pair: symbol === "NQ" ? "NQ=F" : "ES=F", url: "https://finance.yahoo.com" };
+  const priceSourceName = symbol === "PAXG" ? "Binance" : isCrypto ? "Crypto.com" : "Yahoo Finance";
+  const priceSourcePair = symbol === "PAXG" ? "PAXGUSDT" : isCrypto ? `${symbol}_USDT` : symbol === "NQ" ? "NQ=F" : "ES=F";
 
   const closeTimeDesc = isCrypto ? "UTC 00:00 (台灣時間 08:00)" : "UTC 21:00 (台灣時間 05:00)";
 
@@ -284,21 +299,42 @@ function MarketRules({
             遊戲規則
           </h3>
           <div className="space-y-3 text-sm text-muted-foreground leading-relaxed">
-            <p>
-              本市場預測 <span className="text-foreground font-semibold">{symbol}</span> 今日收盤價是否會
-              <span className="text-emerald-400 font-semibold"> 高於 </span>
-              目標價格 <span className="text-foreground font-semibold">${strikePrice.toLocaleString()}</span>。
-            </p>
-            <ul className="space-y-2 ml-1">
-              <li className="flex gap-2">
-                <span className="text-emerald-400 font-bold shrink-0">Yes</span>
-                <span>= 你預測收盤價將 <span className="text-foreground">高於</span> 目標價格</span>
-              </li>
-              <li className="flex gap-2">
-                <span className="text-red-400 font-bold shrink-0">No&nbsp;</span>
-                <span>= 你預測收盤價將 <span className="text-foreground">等於或低於</span> 目標價格</span>
-              </li>
-            </ul>
+            {isUpdown ? (
+              <>
+                <p>
+                  本市場預測 <span className="text-foreground font-semibold">{symbol}</span> 今日收盤價相較於開盤參考價
+                  <span className="text-foreground font-semibold"> {formatPrice(refPrice, symbol)}</span> 是漲還是跌。
+                </p>
+                <ul className="space-y-2 ml-1">
+                  <li className="flex gap-2">
+                    <span className="text-emerald-400 font-bold shrink-0">漲 Up</span>
+                    <span>= 你預測收盤價將 <span className="text-foreground">高於</span> 開盤參考價</span>
+                  </li>
+                  <li className="flex gap-2">
+                    <span className="text-red-400 font-bold shrink-0">跌 Down</span>
+                    <span>= 你預測收盤價將 <span className="text-foreground">等於或低於</span> 開盤參考價</span>
+                  </li>
+                </ul>
+              </>
+            ) : (
+              <>
+                <p>
+                  本市場預測 <span className="text-foreground font-semibold">{symbol}</span> 今日收盤價是否會
+                  <span className="text-emerald-400 font-semibold"> 高於 </span>
+                  目標價格 <span className="text-foreground font-semibold">{formatPrice(strikePrice, symbol)}</span>。
+                </p>
+                <ul className="space-y-2 ml-1">
+                  <li className="flex gap-2">
+                    <span className="text-emerald-400 font-bold shrink-0">Yes</span>
+                    <span>= 你預測收盤價將 <span className="text-foreground">高於</span> 目標價格</span>
+                  </li>
+                  <li className="flex gap-2">
+                    <span className="text-red-400 font-bold shrink-0">No&nbsp;</span>
+                    <span>= 你預測收盤價將 <span className="text-foreground">等於或低於</span> 目標價格</span>
+                  </li>
+                </ul>
+              </>
+            )}
           </div>
         </div>
 
@@ -312,8 +348,8 @@ function MarketRules({
           </h3>
           <div className="space-y-3 text-sm text-muted-foreground leading-relaxed">
             <p>
-              本市場的結算價格來源為 <span className="text-foreground font-semibold">{priceSource.name}</span>，
-              交易對為 <span className="text-foreground font-mono text-xs bg-secondary px-1.5 py-0.5 rounded">{priceSource.pair}</span>。
+              本市場的結算價格來源為 <span className="text-foreground font-semibold">{priceSourceName}</span>，
+              交易對為 <span className="text-foreground font-mono text-xs bg-secondary px-1.5 py-0.5 rounded">{priceSourcePair}</span>。
             </p>
             <p>
               收盤時間為每日 <span className="text-foreground font-semibold">{closeTimeDesc}</span>，

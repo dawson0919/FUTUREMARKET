@@ -30,6 +30,9 @@ export function BettingPanel({ market, onBetPlaced }: BettingPanelProps) {
 
   const bettable = isMarketBettable(market.cutoff_time) && market.status === "open";
   const { yesPercent, noPercent } = calculateOdds(market.yes_pool, market.no_pool);
+  const isUpdown = market.strike_price === 0.01;
+  const yesLabel = isUpdown ? "漲 Up" : "Yes";
+  const noLabel = isUpdown ? "跌 Down" : "No";
   const betAmount = parseInt(amount) || 0;
 
   const potentialPayout = calculatePotentialPayout(
@@ -126,7 +129,7 @@ export function BettingPanel({ market, onBetPlaced }: BettingPanelProps) {
               : "bg-secondary text-muted-foreground hover:bg-emerald-500/10 hover:text-emerald-400"
           }`}
         >
-          Yes {yesPercent}%
+          {yesLabel} {yesPercent}%
         </button>
         <button
           onClick={() => setSide("no")}
@@ -136,7 +139,7 @@ export function BettingPanel({ market, onBetPlaced }: BettingPanelProps) {
               : "bg-secondary text-muted-foreground hover:bg-red-500/10 hover:text-red-400"
           }`}
         >
-          No {noPercent}%
+          {noLabel} {noPercent}%
         </button>
       </div>
 
@@ -205,8 +208,8 @@ export function BettingPanel({ market, onBetPlaced }: BettingPanelProps) {
           <Loader2 className="h-4 w-4 animate-spin mr-2" />
         ) : null}
         {loading
-          ? "Placing Bet..."
-          : `Bet ${betAmount > 0 ? formatChips(betAmount) : ""} on ${side.toUpperCase()}`}
+          ? "下注中..."
+          : `下注 ${betAmount > 0 ? formatChips(betAmount) : ""} → ${side === "yes" ? yesLabel : noLabel}`}
       </Button>
     </Card>
   );
