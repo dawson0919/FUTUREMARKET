@@ -68,7 +68,7 @@ export async function GET(request: NextRequest) {
       period_wins: s.wins,
     }))
     .sort((a, b) => b.period_profit - a.period_profit)
-    .slice(0, 50);
+    .slice(0, 10);
 
   if (entries.length === 0) {
     return NextResponse.json({ leaderboard: [] });

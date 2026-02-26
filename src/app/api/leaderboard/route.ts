@@ -63,7 +63,7 @@ export async function GET() {
       };
     })
     .sort((a, b) => b.total_profit - a.total_profit)
-    .slice(0, 100);
+    .slice(0, 10);
 
   return NextResponse.json({ leaderboard });
 }

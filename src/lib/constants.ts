@@ -4,7 +4,7 @@ export const CUTOFF_MINUTES = 120; // 2 hours before close
 export const INSTRUMENTS = [
   { symbol: "BTC", name: "Bitcoin", type: "crypto" as const, icon: "₿", color: "#F7931A" },
   { symbol: "ETH", name: "Ethereum", type: "crypto" as const, icon: "Ξ", color: "#627EEA" },
-  { symbol: "PAXG", name: "Pax Gold", type: "crypto" as const, icon: "🪙", color: "#D4AF37" },
+  { symbol: "PAXG", name: "Pax Gold", type: "crypto" as const, icon: "Au", color: "#D4AF37" },
   { symbol: "NQ", name: "Nasdaq 100", type: "futures" as const, icon: "📊", color: "#00C853" },
   { symbol: "ES", name: "S&P 500", type: "futures" as const, icon: "📈", color: "#2196F3" },
 ] as const;
