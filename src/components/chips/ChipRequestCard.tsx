@@ -28,7 +28,18 @@ export function ChipRequestCard() {
               </a>
             </li>
             <li>完成 KYC 身分驗證</li>
-            <li>聯繫小編並提供您的 EMAIL 帳號</li>
+            <li>
+              <a
+                href="https://lin.ee/WuRqowF"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-emerald-400 hover:text-emerald-300 underline underline-offset-2 inline-flex items-center gap-1"
+              >
+                聯繫小編
+                <ExternalLink className="h-3 w-3" />
+              </a>
+              並提供您的 EMAIL 帳號
+            </li>
             <li>管理員確認後將發放 100,000 籌碼</li>
           </ol>
         </div>
