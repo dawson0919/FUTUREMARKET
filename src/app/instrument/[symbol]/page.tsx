@@ -104,7 +104,7 @@ export default function InstrumentPage({
     if (!selectedMarket) return;
     const amount = parseInt(betAmount);
     if (!amount || amount <= 0) { setBetError("請輸入有效金額"); return; }
-    if (profile && amount > profile.chips_balance) { setBetError("籌碼不足"); return; }
+    if (profile && amount > profile.chips_balance) { setBetError("籌碼不足，請透過每日簽到獲取！"); return; }
 
     setBetLoading(true);
     setBetError("");
@@ -215,9 +215,8 @@ export default function InstrumentPage({
               return (
                 <div
                   key={market.id}
-                  className={`grid grid-cols-[1fr_80px_140px_140px] items-center px-4 py-3.5 transition-colors ${
-                    i > 0 ? "border-t border-border/30" : ""
-                  } ${isSelected ? "bg-accent/30" : "hover:bg-accent/10"}`}
+                  className={`grid grid-cols-[1fr_80px_140px_140px] items-center px-4 py-3.5 transition-colors ${i > 0 ? "border-t border-border/30" : ""
+                    } ${isSelected ? "bg-accent/30" : "hover:bg-accent/10"}`}
                 >
                   {/* Strike Price */}
                   <div>
@@ -244,11 +243,10 @@ export default function InstrumentPage({
                     <button
                       disabled={!bettable || !isSignedIn}
                       onClick={() => selectMarket(market, "yes")}
-                      className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all min-w-[120px] ${
-                        isSelected && betSide === "yes"
+                      className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all min-w-[120px] ${isSelected && betSide === "yes"
                           ? "bg-emerald-500 text-white"
                           : "bg-emerald-500/10 text-emerald-500 border border-emerald-500/30 hover:bg-emerald-500/20"
-                      } disabled:opacity-30 disabled:cursor-not-allowed`}
+                        } disabled:opacity-30 disabled:cursor-not-allowed`}
                     >
                       買入 是 {formatCents(yesCents)}
                     </button>
@@ -259,11 +257,10 @@ export default function InstrumentPage({
                     <button
                       disabled={!bettable || !isSignedIn}
                       onClick={() => selectMarket(market, "no")}
-                      className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all min-w-[120px] ${
-                        isSelected && betSide === "no"
+                      className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all min-w-[120px] ${isSelected && betSide === "no"
                           ? "bg-red-500 text-white"
                           : "bg-red-500/10 text-red-500 border border-red-500/30 hover:bg-red-500/20"
-                      } disabled:opacity-30 disabled:cursor-not-allowed`}
+                        } disabled:opacity-30 disabled:cursor-not-allowed`}
                     >
                       買入 否 {formatCents(noCents)}
                     </button>
@@ -329,7 +326,7 @@ export default function InstrumentPage({
                   <span className="font-mono text-xs bg-secondary px-1.5 py-0.5 rounded">
                     {upperSymbol === "PAXG" ? "PAXGUSDT"
                       : inst?.type === "crypto"
-                        ? (upperSymbol === "XAUT" ? "XAUT_USD" : `${upperSymbol}_USDT`)
+                        ? `${upperSymbol}_USDT`
                         : (upperSymbol === "NQ" ? "NQ=F" : "ES=F")}
                   </span>
                   。不同交易所或不同交易對的價格不列入結算依據。
@@ -384,21 +381,19 @@ export default function InstrumentPage({
                     <div className="grid grid-cols-2 gap-2 mb-5">
                       <button
                         onClick={() => setBetSide("yes")}
-                        className={`py-3 rounded-lg font-bold text-sm transition-all ${
-                          betSide === "yes"
+                        className={`py-3 rounded-lg font-bold text-sm transition-all ${betSide === "yes"
                             ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/20"
                             : "bg-secondary text-muted-foreground hover:bg-emerald-500/10"
-                        }`}
+                          }`}
                       >
                         是 {formatCents(selectedPrices.yesCents)}
                       </button>
                       <button
                         onClick={() => setBetSide("no")}
-                        className={`py-3 rounded-lg font-bold text-sm transition-all ${
-                          betSide === "no"
+                        className={`py-3 rounded-lg font-bold text-sm transition-all ${betSide === "no"
                             ? "bg-red-500 text-white shadow-lg shadow-red-500/20"
                             : "bg-secondary text-muted-foreground hover:bg-red-500/10"
-                        }`}
+                          }`}
                       >
                         否 {formatCents(selectedPrices.noCents)}
                       </button>
@@ -473,11 +468,10 @@ export default function InstrumentPage({
                   <Button
                     onClick={handleBet}
                     disabled={betLoading || !parseInt(betAmount) || !isSignedIn}
-                    className={`w-full py-6 text-base font-bold ${
-                      betSide === "yes"
+                    className={`w-full py-6 text-base font-bold ${betSide === "yes"
                         ? "bg-blue-600 hover:bg-blue-700"
                         : "bg-red-500 hover:bg-red-600"
-                    }`}
+                      }`}
                   >
                     {betLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : "交易"}
                   </Button>

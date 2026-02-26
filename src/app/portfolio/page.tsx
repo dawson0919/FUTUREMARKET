@@ -270,10 +270,12 @@ export default function PortfolioPage() {
                           ? "bg-blue-500/20 text-blue-400 border-blue-500/30"
                           : tx.type === "checkin"
                           ? "bg-yellow-500/20 text-yellow-400 border-yellow-500/30"
+                          : tx.type === "admin_grant"
+                          ? "bg-purple-500/20 text-purple-400 border-purple-500/30"
                           : ""
                       }
                     >
-                      {tx.type === "bet" ? "下注" : tx.type === "payout" ? "派彩" : tx.type === "checkin" ? "簽到" : tx.type}
+                      {tx.type === "bet" ? "下注" : tx.type === "payout" ? "派彩" : tx.type === "checkin" ? "簽到" : tx.type === "admin_grant" ? "管理員發放" : tx.type}
                     </Badge>
                     {tx.side && (
                       <span

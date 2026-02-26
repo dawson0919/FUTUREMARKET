@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
-import { TrendingUp, Trophy, Briefcase, Coins } from "lucide-react";
+import { TrendingUp, Trophy, Briefcase, Coins, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { formatChips } from "@/lib/constants";
@@ -70,6 +70,15 @@ export function Header() {
                       {formatChips(profile.chips_balance)}
                     </span>
                   </div>
+                )}
+                {profile?.is_admin && (
+                  <Link
+                    href="/admin"
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-500/10 text-red-400 text-xs font-semibold hover:bg-red-500/20 transition-colors"
+                  >
+                    <Shield className="h-3.5 w-3.5" />
+                    管理
+                  </Link>
                 )}
                 <UserButton
                   appearance={{

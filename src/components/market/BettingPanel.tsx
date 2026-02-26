@@ -52,7 +52,7 @@ export function BettingPanel({ market, onBetPlaced }: BettingPanelProps) {
       return;
     }
     if (profile && betAmount > profile.chips_balance) {
-      setError("籌碼不足");
+      setError("籌碼不足，請透過每日簽到獲取！");
       return;
     }
 
@@ -132,21 +132,19 @@ export function BettingPanel({ market, onBetPlaced }: BettingPanelProps) {
       <div className="grid grid-cols-2 gap-2 mb-4">
         <button
           onClick={() => setSide("yes")}
-          className={`py-3 rounded-lg font-semibold text-sm transition-all ${
-            side === "yes"
+          className={`py-3 rounded-lg font-semibold text-sm transition-all ${side === "yes"
               ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/25"
               : "bg-secondary text-muted-foreground hover:bg-emerald-500/10 hover:text-emerald-400"
-          }`}
+            }`}
         >
           {yesLabel} {yesPercent}%
         </button>
         <button
           onClick={() => setSide("no")}
-          className={`py-3 rounded-lg font-semibold text-sm transition-all ${
-            side === "no"
+          className={`py-3 rounded-lg font-semibold text-sm transition-all ${side === "no"
               ? "bg-red-500 text-white shadow-lg shadow-red-500/25"
               : "bg-secondary text-muted-foreground hover:bg-red-500/10 hover:text-red-400"
-          }`}
+            }`}
         >
           {noLabel} {noPercent}%
         </button>
@@ -207,11 +205,10 @@ export function BettingPanel({ market, onBetPlaced }: BettingPanelProps) {
       <Button
         onClick={handleBet}
         disabled={loading || betAmount <= 0}
-        className={`w-full font-semibold ${
-          side === "yes"
+        className={`w-full font-semibold ${side === "yes"
             ? "bg-emerald-500 hover:bg-emerald-600"
             : "bg-red-500 hover:bg-red-600"
-        }`}
+          }`}
       >
         {loading ? (
           <Loader2 className="h-4 w-4 animate-spin mr-2" />

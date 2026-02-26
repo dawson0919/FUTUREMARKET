@@ -39,7 +39,7 @@ export default function TermsPage() {
             FutureMarket 是一個以虛擬籌碼為基礎的預測市場平台，提供以下功能：
           </p>
           <ul className="list-disc list-inside space-y-1 mt-2">
-            <li>針對加密貨幣（BTC、ETH、XAUT、PAXG）及期貨（NQ、ES）的每日收盤價預測</li>
+            <li>針對加密貨幣（BTC、ETH、PAXG）及期貨（NQ、ES）的每日收盤價預測</li>
             <li>基於 CPMM（恆定乘積做市商）模型的定價機制</li>
             <li>每日自動建立市場、結算市場的完整週期</li>
             <li>排行榜、投資組合等競技功能</li>
@@ -89,7 +89,7 @@ export default function TermsPage() {
               <tbody>
                 <tr className="border-t border-border/50">
                   <td className="px-4 py-2">加密貨幣</td>
-                  <td className="px-4 py-2">BTC、ETH、XAUT、PAXG</td>
+                  <td className="px-4 py-2">BTC、ETH、PAXG</td>
                   <td className="px-4 py-2">UTC 00:00</td>
                   <td className="px-4 py-2">08:00</td>
                   <td className="px-4 py-2">06:00（收盤前 2 小時）</td>
@@ -124,8 +124,8 @@ export default function TermsPage() {
               （BTC_USDT、ETH_USDT、PAXG_USDT）
             </li>
             <li>
-              黃金代幣（XAUT）：
-              <span className="text-foreground font-semibold">Crypto.com</span>（XAUT_USD）
+              黃金代幣（PAXG）：
+              <span className="text-foreground font-semibold">Binance</span>（PAXGUSDT）
             </li>
             <li>
               期貨（NQ、ES）：
@@ -137,7 +137,7 @@ export default function TermsPage() {
           <h3 className="text-base font-semibold text-foreground mt-4 mb-2">3.5 假日規則</h3>
           <p>
             <span className="text-yellow-400 font-semibold">週六、週日（假日）</span>僅開放加密貨幣市場
-            （BTC、ETH、XAUT、PAXG）投注。期貨市場（NQ、ES）因休市而不開放。
+            （BTC、ETH、PAXG）投注。期貨市場（NQ、ES）因休市而不開放。
           </p>
         </section>
 

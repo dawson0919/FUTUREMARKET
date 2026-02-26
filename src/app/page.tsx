@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { UpDownCard } from "@/components/market/UpDownCard";
 import { TopWinnersCard } from "@/components/leaderboard/TopWinnersCard";
 import { DailyCheckinBanner } from "@/components/checkin/DailyCheckinBanner";
+import { ChipRequestCard } from "@/components/chips/ChipRequestCard";
 import { usePrices } from "@/lib/hooks";
 import { supabase } from "@/lib/supabase";
 import { INSTRUMENTS, formatPrice, formatChips, INSTRUMENT_COLORS } from "@/lib/constants";
@@ -189,6 +190,9 @@ export default function HomePage() {
 
       {/* Daily Check-in */}
       <DailyCheckinBanner />
+
+      {/* Chip Request */}
+      <ChipRequestCard />
 
       {/* Top Winners Card */}
       <TopWinnersCard />

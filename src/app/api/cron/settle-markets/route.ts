@@ -142,19 +142,19 @@ export async function POST(request: Request) {
         .eq("id", userId)
         .single();
 
-      if (freshProfile) {
-        await db
-          .from("profiles")
-          .update({
-            chips_balance: freshProfile.chips_balance + agg.totalPayout,
-            total_profit: freshProfile.total_profit + agg.totalProfit,
-            total_trades: freshProfile.total_trades + agg.trades,
-            wins: freshProfile.wins + agg.wins,
-            losses: freshProfile.losses + agg.losses,
-            updated_at: new Date().toISOString(),
-          })
-          .eq("id", userId);
-      }
+      if (!freshProfile) continue;
+
+      await db
+        .from("profiles")
+        .update({
+          chips_balance: freshProfile.chips_balance + agg.totalPayout,
+          total_profit: freshProfile.total_profit + agg.totalProfit,
+          total_trades: freshProfile.total_trades + agg.trades,
+          wins: freshProfile.wins + agg.wins,
+          losses: freshProfile.losses + agg.losses,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", userId);
 
       // Record payout transactions
       for (const txn of agg.payoutTxns) {
@@ -164,6 +164,7 @@ export async function POST(request: Request) {
           type: "payout",
           side: txn.side,
           amount: txn.amount,
+          balance_after: freshProfile.chips_balance + agg.totalPayout,
         });
       }
     }

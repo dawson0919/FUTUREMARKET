@@ -9,7 +9,6 @@ export const contentType = "image/png";
 const INSTRUMENT_COLORS: Record<string, string> = {
   BTC: "#F7931A",
   ETH: "#627EEA",
-  XAUT: "#FFD700",
   PAXG: "#D4AF37",
   NQ: "#00C853",
   ES: "#2196F3",

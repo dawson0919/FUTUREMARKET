@@ -23,6 +23,7 @@ export interface Profile {
   created_at: string;
   last_checkin_date: string | null;
   checkin_streak: number;
+  is_admin: boolean;
 }
 
 export interface Market {
@@ -63,7 +64,7 @@ export interface Transaction {
   id: string;
   user_id: string;
   market_id: string;
-  type: "bet" | "payout" | "refund" | "checkin";
+  type: "bet" | "payout" | "refund" | "checkin" | "admin_grant";
   side: "yes" | "no" | null;
   amount: number;
   balance_after: number;

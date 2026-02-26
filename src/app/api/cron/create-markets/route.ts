@@ -133,7 +133,6 @@ function generateStrikeLevels(currentPrice: number, symbol: string): number[] {
 const STRIKE_CONFIG: Record<string, { step: number; count: number }> = {
   BTC: { step: 2000, count: 5 },
   ETH: { step: 50, count: 5 },
-  XAUT: { step: 50, count: 5 },
   PAXG: { step: 50, count: 5 },
   NQ: { step: 200, count: 5 },
   ES: { step: 50, count: 5 },
@@ -144,7 +143,7 @@ function roundToStep(price: number, step: number): number {
 }
 
 function formatStrikePrice(price: number, symbol: string): string {
-  if (["BTC", "ETH", "XAUT", "PAXG"].includes(symbol)) {
+  if (["BTC", "ETH", "PAXG"].includes(symbol)) {
     return `$${price.toLocaleString()}`;
   }
   return price.toLocaleString();

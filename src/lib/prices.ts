@@ -16,7 +16,6 @@ interface CryptoComTicker {
 const CRYPTO_INSTRUMENTS: Record<string, string> = {
   BTC: "BTC_USDT",
   ETH: "ETH_USDT",
-  XAUT: "XAUT_USD",
 };
 
 // Binance symbols for tokens that use Binance as price source
@@ -125,7 +124,7 @@ export async function getPrice(symbol: string): Promise<PriceData | null> {
 }
 
 export async function getAllPrices(): Promise<Record<string, PriceData>> {
-  const symbols = ["BTC", "ETH", "XAUT", "PAXG", "NQ", "ES"];
+  const symbols = ["BTC", "ETH", "PAXG", "NQ", "ES"];
   const results = await Promise.allSettled(symbols.map((s) => getPrice(s)));
   const prices: Record<string, PriceData> = {};
 

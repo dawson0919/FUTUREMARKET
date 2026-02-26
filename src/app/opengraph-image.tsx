@@ -153,7 +153,6 @@ export default async function Image() {
           {[
             { symbol: "BTC", icon: "₿", color: "#F7931A" },
             { symbol: "ETH", icon: "Ξ", color: "#627EEA" },
-            { symbol: "XAUT", color: "#FFD700" },
             { symbol: "PAXG", color: "#D4AF37" },
             { symbol: "NQ", color: "#00C853" },
             { symbol: "ES", color: "#2196F3" },

@@ -88,7 +88,6 @@ CREATE INDEX idx_profiles_clerk ON profiles(clerk_id);
 INSERT INTO instruments (symbol, name, type, icon, close_hour, close_minute, cutoff_minutes) VALUES
   ('BTC', 'Bitcoin', 'crypto', '₿', 0, 0, 120),
   ('ETH', 'Ethereum', 'crypto', 'Ξ', 0, 0, 120),
-  ('XAUT', 'Tether Gold', 'crypto', '🥇', 0, 0, 120),
   ('NQ', 'Nasdaq 100 Futures', 'futures', '📊', 21, 0, 120),
   ('ES', 'S&P 500 Futures', 'futures', '📈', 21, 0, 120);
 

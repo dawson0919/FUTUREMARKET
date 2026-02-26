@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import { useUser } from "@clerk/nextjs";
 import type { Profile, Market, PriceData } from "@/types";
 import { supabase } from "./supabase";
+import { INITIAL_CHIPS } from "./constants";
 
 export function useUserProfile() {
   const { user, isLoaded } = useUser();
@@ -38,6 +39,7 @@ export function useUserProfile() {
               user.firstName ||
               `Player${user.id.slice(-4)}`,
             avatar_url: user.imageUrl,
+            chips_balance: INITIAL_CHIPS,
           })
           .select()
           .single();
