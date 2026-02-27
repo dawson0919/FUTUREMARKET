@@ -14,6 +14,21 @@ const INSTRUMENT_COLORS: Record<string, string> = {
   ES: "#2196F3",
 };
 
+async function loadFont(text: string) {
+  const API = `https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@700;900&text=${encodeURIComponent(text)}&display=swap`;
+  const css = await fetch(API, {
+    headers: {
+      "User-Agent":
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+    },
+  }).then((res) => res.text());
+
+  const match = css.match(/src:\s*url\((.+?)\)\s*format/);
+  if (!match) return null;
+
+  return fetch(match[1]).then((res) => res.arrayBuffer());
+}
+
 export default async function Image({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
 
@@ -50,6 +65,10 @@ export default async function Image({ params }: { params: Promise<{ id: string }
 
   const isUpdown = title.includes("漲還是跌");
 
+  // Collect all Chinese text for font subsetting
+  const allText = `${title}漲跌是否免費籌碼投注立即加入預測`;
+  const fontData = await loadFont(allText);
+
   return new ImageResponse(
     (
       <div
@@ -61,7 +80,7 @@ export default async function Image({ params }: { params: Promise<{ id: string }
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          fontFamily: "sans-serif",
+          fontFamily: "'Noto Sans SC', sans-serif",
           position: "relative",
         }}
       >
@@ -196,6 +215,18 @@ export default async function Image({ params }: { params: Promise<{ id: string }
         </div>
       </div>
     ),
-    { ...size }
+    {
+      ...size,
+      fonts: fontData
+        ? [
+            {
+              name: "Noto Sans SC",
+              data: fontData,
+              weight: 700 as const,
+              style: "normal" as const,
+            },
+          ]
+        : [],
+    }
   );
 }

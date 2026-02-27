@@ -1,11 +1,31 @@
 import { ImageResponse } from "next/og";
 
 export const runtime = "edge";
-export const alt = "FutureMarket - 預測市場";
+export const alt = "FutureMarket - 你今天預測了嗎？";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
+// Collect all Chinese characters used in the image
+const ALL_TEXT = "你今天預測了嗎？免費籌碼競技每日結算登上排行榜即時賠率";
+
+async function loadFont() {
+  const API = `https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@700;900&text=${encodeURIComponent(ALL_TEXT)}&display=swap`;
+  const css = await fetch(API, {
+    headers: {
+      "User-Agent":
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+    },
+  }).then((res) => res.text());
+
+  const match = css.match(/src:\s*url\((.+?)\)\s*format/);
+  if (!match) return null;
+
+  return fetch(match[1]).then((res) => res.arrayBuffer());
+}
+
 export default async function Image() {
+  const fontData = await loadFont();
+
   return new ImageResponse(
     (
       <div
@@ -17,7 +37,7 @@ export default async function Image() {
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          fontFamily: "sans-serif",
+          fontFamily: "'Noto Sans SC', sans-serif",
           position: "relative",
         }}
       >
@@ -115,11 +135,11 @@ export default async function Image() {
           </div>
         </div>
 
-        {/* Title */}
+        {/* Title - Slogan */}
         <div
           style={{
             fontSize: "48px",
-            fontWeight: 800,
+            fontWeight: 900,
             color: "white",
             marginBottom: "16px",
             textAlign: "center",
@@ -151,8 +171,8 @@ export default async function Image() {
           }}
         >
           {[
-            { symbol: "BTC", icon: "₿", color: "#F7931A" },
-            { symbol: "ETH", icon: "Ξ", color: "#627EEA" },
+            { symbol: "BTC", color: "#F7931A" },
+            { symbol: "ETH", color: "#627EEA" },
             { symbol: "PAXG", color: "#D4AF37" },
             { symbol: "NQ", color: "#00C853" },
             { symbol: "ES", color: "#2196F3" },
@@ -203,13 +223,25 @@ export default async function Image() {
             fontSize: "18px",
           }}
         >
-          <span style={{ display: "flex" }}>🎯 每日預測</span>
-          <span style={{ display: "flex" }}>📊 即時賠率</span>
-          <span style={{ display: "flex" }}>🏆 排行榜競技</span>
-          <span style={{ display: "flex" }}>💰 免費籌碼</span>
+          <span style={{ display: "flex" }}>每日預測</span>
+          <span style={{ display: "flex" }}>即時賠率</span>
+          <span style={{ display: "flex" }}>排行榜競技</span>
+          <span style={{ display: "flex" }}>免費籌碼</span>
         </div>
       </div>
     ),
-    { ...size }
+    {
+      ...size,
+      fonts: fontData
+        ? [
+            {
+              name: "Noto Sans SC",
+              data: fontData,
+              weight: 700 as const,
+              style: "normal" as const,
+            },
+          ]
+        : [],
+    }
   );
 }
