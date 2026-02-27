@@ -1,14 +1,14 @@
 import { Separator } from "@/components/ui/separator";
 
 export const metadata = {
-  title: "使用條款 - FutureMarket",
-  description: "FutureMarket 平台使用條款",
+  title: "使用條款 - The Future Market",
+  description: "The Future Market 平台使用條款",
 };
 
 export default function TermsPage() {
   return (
     <div className="max-w-4xl mx-auto py-8">
-      <h1 className="text-3xl font-bold mb-2">FutureMarket 使用條款</h1>
+      <h1 className="text-3xl font-bold mb-2">The Future Market 使用條款</h1>
       <p className="text-muted-foreground text-sm mb-8">
         最後更新日期：2026 年 2 月 25 日
       </p>
@@ -19,7 +19,7 @@ export default function TermsPage() {
           <h2 className="text-xl font-bold text-foreground mb-3">一、簡介</h2>
           <p>
             本使用條款（以下簡稱「條款」）規範您（無論是個人或代表實體）使用、互動或以其他方式存取
-            FutureMarket 平台（以下簡稱「平台」、「我們」）所提供之介面與功能的條件。
+            The Future Market 平台（以下簡稱「平台」、「我們」）所提供之介面與功能的條件。
           </p>
           <p className="mt-2">
             本條款連同我們的隱私權政策，構成您與我們之間具有約束力的協議。當您存取、使用或以其他方式
@@ -36,7 +36,7 @@ export default function TermsPage() {
 
           <h3 className="text-base font-semibold text-foreground mt-4 mb-2">2.1 平台功能</h3>
           <p>
-            FutureMarket 是一個以虛擬籌碼為基礎的預測市場平台，提供以下功能：
+            The Future Market 是一個以虛擬籌碼為基礎的預測市場平台，提供以下功能：
           </p>
           <ul className="list-disc list-inside space-y-1 mt-2">
             <li>針對加密貨幣（BTC、ETH、PAXG）及期貨（NQ、ES）的每日收盤價預測</li>
@@ -395,7 +395,7 @@ export default function TermsPage() {
         </section>
 
         <div className="mt-12 pt-6 border-t border-border text-center text-xs text-muted-foreground">
-          <p>&copy; 2026 FutureMarket. 保留所有權利。</p>
+          <p>&copy; 2026 The Future Market. 保留所有權利。</p>
           <p className="mt-1">本平台僅供娛樂競技使用，所有籌碼均為虛擬貨幣，不涉及任何真實資金。</p>
         </div>
       </div>

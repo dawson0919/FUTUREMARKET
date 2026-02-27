@@ -3,7 +3,7 @@ import { createClient } from "@supabase/supabase-js";
 import { readFileSync } from "fs";
 import { join } from "path";
 
-export const alt = "FutureMarket 預測市場";
+export const alt = "The Future Market 預測市場";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -19,7 +19,7 @@ export default async function Image({ params }: { params: Promise<{ id: string }
   const { id } = await params;
   const fontData = readFileSync(join(process.cwd(), "src/app/fonts/NotoSansSC-Bold.ttf"));
 
-  let title = "FutureMarket 預測市場";
+  let title = "The Future Market 預測市場";
   let color = "#6d5dfc";
   let yesPercent = 50;
   let isUpdown = false;
@@ -102,7 +102,7 @@ export default async function Image({ params }: { params: Promise<{ id: string }
             FM
           </div>
           <span style={{ fontSize: "28px", fontWeight: 700, color: "#888", display: "flex" }}>
-            FutureMarket
+            The Future Market
           </span>
         </div>
         <div

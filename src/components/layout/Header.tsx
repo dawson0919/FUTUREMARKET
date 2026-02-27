@@ -36,7 +36,7 @@ export function Header() {
               <path d="M34 12L42 13L41 21" stroke="#4ade80" strokeWidth="4.5" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </div>
-          <span className="text-lg font-bold tracking-tight">FUTUREMARKET</span>
+          <span className="text-lg font-bold tracking-tight">THE FUTURE MARKET</span>
         </Link>
 
         {/* Navigation */}

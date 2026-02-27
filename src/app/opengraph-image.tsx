@@ -2,7 +2,7 @@ import { ImageResponse } from "next/og";
 import { readFileSync } from "fs";
 import { join } from "path";
 
-export const alt = "FutureMarket - 你今天預測了嗎？";
+export const alt = "The Future Market - 你今天預測了嗎？";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -88,7 +88,7 @@ export default async function Image() {
                 lineHeight: 1,
               }}
             >
-              FUTUREMARKET
+              THE FUTURE MARKET
             </span>
             <span
               style={{
