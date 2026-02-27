@@ -241,6 +241,7 @@ export default function LeaderboardPage() {
               ))
             )}
           </Card>
+          <p className="text-center text-xs text-muted-foreground mt-4">僅顯示前 10 名</p>
         </>
       )}
     </div>
