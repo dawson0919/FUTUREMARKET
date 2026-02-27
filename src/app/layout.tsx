@@ -18,16 +18,16 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "FutureMarket - 預測期貨與加密貨幣收盤價",
+  title: "FutureMarket - 你今天預測了嗎？",
   description:
     "預測 BTC、ETH、黃金、Nasdaq、S&P 500 每日收盤價。免費籌碼競技，每日結算，登上排行榜！",
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3001"),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://futuremarket-production.up.railway.app"),
   icons: {
     icon: "/icon.svg",
     apple: "/logo.svg",
   },
   openGraph: {
-    title: "FutureMarket - 預測期貨與加密貨幣收盤價",
+    title: "FutureMarket - 你今天預測了嗎？",
     description:
       "預測 BTC、ETH、黃金、Nasdaq、S&P 500 每日收盤價。免費籌碼競技，每日結算，登上排行榜！",
     siteName: "FutureMarket",
@@ -36,12 +36,12 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "FutureMarket - 預測期貨與加密貨幣收盤價",
+    title: "FutureMarket - 你今天預測了嗎？",
     description:
       "預測 BTC、ETH、黃金、Nasdaq、S&P 500 每日收盤價。免費籌碼競技，每日結算，登上排行榜！",
   },
   other: {
-    "line:title": "FutureMarket - 預測市場",
+    "line:title": "FutureMarket - 你今天預測了嗎？",
     "line:description": "免費籌碼預測加密貨幣與期貨收盤價，每日結算！",
   },
 };
