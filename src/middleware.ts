@@ -12,6 +12,7 @@ const isPublicRoute = createRouteMatcher([
   "/terms",
   "/instrument(.*)",
   "/market(.*)",
+  "/opengraph-image(.*)",
 ]);
 
 export default clerkMiddleware(async (auth, request) => {
