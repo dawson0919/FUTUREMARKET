@@ -151,9 +151,12 @@ export default function HomePage() {
       {/* Hero */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">預測市場</h1>
-        <p className="text-muted-foreground mb-4">
+        <p className="text-muted-foreground mb-3">
           預測期貨與加密貨幣的每日收盤價，用免費籌碼下注，登上排行榜！
         </p>
+        <div className="rounded-lg bg-purple-500/10 border border-purple-500/30 px-4 py-2.5 mb-4 text-sm text-purple-300">
+          目前封測期間，請多多測試使用，未來將舉辦比賽！
+        </div>
         <div className="flex flex-wrap gap-3 text-xs mb-4">
           <div className="flex items-center gap-1.5 bg-secondary rounded-lg px-3 py-1.5">
             <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
