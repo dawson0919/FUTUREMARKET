@@ -127,7 +127,7 @@ export default async function Image() {
             display: "flex",
           }}
         >
-          預測期貨與加密貨幣收盤價
+          你今天預測了嗎？
         </div>
 
         {/* Subtitle */}
