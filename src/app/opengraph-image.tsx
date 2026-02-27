@@ -1,33 +1,13 @@
 import { ImageResponse } from "next/og";
+import { readFileSync } from "fs";
+import { join } from "path";
 
 export const alt = "FutureMarket - 你今天預測了嗎？";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
-const ALL_TEXT = "你今天預測了嗎？免費籌碼競技每日結算登上排行榜即時賠率每日預測";
-
-async function loadFont(): Promise<ArrayBuffer | null> {
-  try {
-    const API = `https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@700;900&text=${encodeURIComponent(ALL_TEXT)}&display=swap`;
-    const css = await fetch(API, {
-      headers: {
-        "User-Agent":
-          "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-      },
-    }).then((res) => res.text());
-
-    const match = css.match(/src:\s*url\((.+?)\)\s*format/);
-    if (!match) return null;
-
-    return await fetch(match[1]).then((res) => res.arrayBuffer());
-  } catch {
-    return null;
-  }
-}
-
 export default async function Image() {
-  const fontData = await loadFont();
-  const hasCJK = !!fontData;
+  const fontData = readFileSync(join(process.cwd(), "src/app/fonts/NotoSansSC-Bold.ttf"));
 
   return new ImageResponse(
     (
@@ -40,7 +20,7 @@ export default async function Image() {
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          fontFamily: hasCJK ? "'Noto Sans SC', sans-serif" : "sans-serif",
+          fontFamily: "'Noto Sans SC', sans-serif",
           position: "relative",
         }}
       >
@@ -136,7 +116,7 @@ export default async function Image() {
             display: "flex",
           }}
         >
-          {hasCJK ? "你今天預測了嗎？" : "Predict. Compete. Win."}
+          你今天預測了嗎？
         </div>
 
         {/* Subtitle */}
@@ -149,9 +129,7 @@ export default async function Image() {
             display: "flex",
           }}
         >
-          {hasCJK
-            ? "免費籌碼競技，每日結算，登上排行榜！"
-            : "Free chips, daily settlement, climb the leaderboard!"}
+          免費籌碼競技，每日結算，登上排行榜！
         </div>
 
         {/* Instrument pills */}
@@ -214,36 +192,23 @@ export default async function Image() {
             fontSize: "18px",
           }}
         >
-          {hasCJK ? (
-            <>
-              <span style={{ display: "flex" }}>每日預測</span>
-              <span style={{ display: "flex" }}>即時賠率</span>
-              <span style={{ display: "flex" }}>排行榜競技</span>
-              <span style={{ display: "flex" }}>免費籌碼</span>
-            </>
-          ) : (
-            <>
-              <span style={{ display: "flex" }}>Daily Predictions</span>
-              <span style={{ display: "flex" }}>Live Odds</span>
-              <span style={{ display: "flex" }}>Leaderboard</span>
-              <span style={{ display: "flex" }}>Free Chips</span>
-            </>
-          )}
+          <span style={{ display: "flex" }}>每日預測</span>
+          <span style={{ display: "flex" }}>即時賠率</span>
+          <span style={{ display: "flex" }}>排行榜競技</span>
+          <span style={{ display: "flex" }}>免費籌碼</span>
         </div>
       </div>
     ),
     {
       ...size,
-      fonts: fontData
-        ? [
-            {
-              name: "Noto Sans SC",
-              data: fontData,
-              weight: 700 as const,
-              style: "normal" as const,
-            },
-          ]
-        : [],
+      fonts: [
+        {
+          name: "Noto Sans SC",
+          data: fontData,
+          weight: 700 as const,
+          style: "normal" as const,
+        },
+      ],
     }
   );
 }
