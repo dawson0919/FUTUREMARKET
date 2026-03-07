@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useUser } from "@clerk/nextjs";
+import { useSession } from "next-auth/react";
 import { Gift, Flame, Check } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -17,7 +17,7 @@ function getRewardForStreak(streak: number): number {
 }
 
 export function DailyCheckinBanner() {
-  const { isSignedIn } = useUser();
+  const { data: session } = useSession();
   const { profile, refreshProfile } = useUserProfile();
   const { showToast } = useToast();
   const [checkedIn, setCheckedIn] = useState(false);
@@ -36,7 +36,7 @@ export function DailyCheckinBanner() {
     setStreak(profile.checkin_streak || 0);
   }, [profile]);
 
-  if (!isSignedIn || !profile) return null;
+  if (!session || !profile) return null;
 
   async function handleCheckin() {
     setLoading(true);

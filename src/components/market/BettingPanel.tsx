@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useUser } from "@clerk/nextjs";
+import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
@@ -22,7 +22,7 @@ interface BettingPanelProps {
 }
 
 export function BettingPanel({ market, onBetPlaced }: BettingPanelProps) {
-  const { isSignedIn } = useUser();
+  const { data: session } = useSession();
   const { profile, refreshProfile } = useUserProfile();
   const { showToast } = useToast();
   const [side, setSide] = useState<"yes" | "no">("yes");
@@ -107,7 +107,7 @@ export function BettingPanel({ market, onBetPlaced }: BettingPanelProps) {
     );
   }
 
-  if (!isSignedIn) {
+  if (!session) {
     return (
       <Card className="p-6 border-border/50">
         <div className="flex flex-col items-center gap-3 py-4 text-muted-foreground">

@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { ClerkProvider } from "@clerk/nextjs";
-import { dark } from "@clerk/themes";
+import { Providers } from "@/components/Providers";
 import { Header } from "@/components/layout/Header";
 import { ToastProvider } from "@/components/ui/toast-notification";
 import { SettlementNotifier } from "@/components/layout/SettlementNotifier";
@@ -52,28 +51,20 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider
-      appearance={{
-        baseTheme: dark,
-        variables: {
-          colorPrimary: "#6d5dfc",
-          colorBackground: "#000000",
-        },
-      }}
-    >
-      <html lang="zh-TW" className="dark" suppressHydrationWarning>
-        <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen`}
-          style={{ backgroundColor: "#000000", color: "#f0f0f0" }}
-          suppressHydrationWarning
-        >
+    <html lang="zh-TW" className="dark" suppressHydrationWarning>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen`}
+        style={{ backgroundColor: "#000000", color: "#f0f0f0" }}
+        suppressHydrationWarning
+      >
+        <Providers>
           <ToastProvider>
             <Header />
             <SettlementNotifier />
             <main className="mx-auto max-w-7xl px-4 py-6">{children}</main>
           </ToastProvider>
-        </body>
-      </html>
-    </ClerkProvider>
+        </Providers>
+      </body>
+    </html>
   );
 }

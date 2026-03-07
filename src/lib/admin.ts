@@ -1,4 +1,5 @@
-import { auth } from "@clerk/nextjs/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 import { getServiceSupabase } from "@/lib/supabase";
 
 export async function isCurrentUserAdmin(): Promise<{
@@ -6,7 +7,8 @@ export async function isCurrentUserAdmin(): Promise<{
   userId: string | null;
   profileId: string | null;
 }> {
-  const { userId } = await auth();
+  const session = await getServerSession(authOptions);
+  const userId = session?.user?.id ?? null;
   if (!userId) return { isAdmin: false, userId: null, profileId: null };
 
   const db = getServiceSupabase();

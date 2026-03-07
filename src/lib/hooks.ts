@@ -1,29 +1,31 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { useUser } from "@clerk/nextjs";
+import { useSession } from "next-auth/react";
 import type { Profile, Market, PriceData } from "@/types";
 import { supabase } from "./supabase";
 import { INITIAL_CHIPS } from "./constants";
 
 export function useUserProfile() {
-  const { user, isLoaded } = useUser();
+  const { data: session, status } = useSession();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
 
   const fetchOrCreateProfile = useCallback(async () => {
-    if (!user) {
+    if (!session?.user?.id) {
       setProfile(null);
       setLoading(false);
       return;
     }
+
+    const userId = session.user.id;
 
     try {
       // Try to fetch existing profile
       const { data, error } = await supabase
         .from("profiles")
         .select("*")
-        .eq("clerk_id", user.id)
+        .eq("clerk_id", userId)
         .single();
 
       if (data && !error) {
@@ -33,12 +35,11 @@ export function useUserProfile() {
         const { data: newProfile, error: insertError } = await supabase
           .from("profiles")
           .insert({
-            clerk_id: user.id,
+            clerk_id: userId,
             username:
-              user.username ||
-              user.firstName ||
-              `Player${user.id.slice(-4)}`,
-            avatar_url: user.imageUrl,
+              session.user.name ||
+              `Player${userId.slice(-4)}`,
+            avatar_url: session.user.image,
             chips_balance: INITIAL_CHIPS,
           })
           .select()
@@ -53,23 +54,23 @@ export function useUserProfile() {
     } finally {
       setLoading(false);
     }
-  }, [user]);
+  }, [session]);
 
   useEffect(() => {
-    if (isLoaded) {
+    if (status !== "loading") {
       fetchOrCreateProfile();
     }
-  }, [isLoaded, fetchOrCreateProfile]);
+  }, [status, fetchOrCreateProfile]);
 
   const refreshProfile = useCallback(async () => {
-    if (!user) return;
+    if (!session?.user?.id) return;
     const { data } = await supabase
       .from("profiles")
       .select("*")
-      .eq("clerk_id", user.id)
+      .eq("clerk_id", session.user.id)
       .single();
     if (data) setProfile(data);
-  }, [user]);
+  }, [session]);
 
   return { profile, loading, refreshProfile };
 }

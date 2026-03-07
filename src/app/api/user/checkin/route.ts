@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 import { getServiceSupabase } from "@/lib/supabase";
 
 function getCheckinReward(streak: number): number {
@@ -23,10 +24,9 @@ function getYesterdayDateString(): string {
 }
 
 export async function POST() {
-  const { userId } = await auth();
-  if (!userId) {
-    return NextResponse.json({ error: "請先登入" }, { status: 401 });
-  }
+  const session = await getServerSession(authOptions);
+  const userId = session?.user?.id;
+  if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const supabase = getServiceSupabase();
 

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 import { getServiceSupabase } from "@/lib/supabase";
 import { calculatePotentialPayout, isMarketBettable } from "@/lib/market-maker";
 
@@ -7,7 +8,8 @@ export async function POST(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { userId } = await auth();
+  const session = await getServerSession(authOptions);
+  const userId = session?.user?.id;
   if (!userId) {
     return NextResponse.json({ error: "請先登入再下注" }, { status: 401 });
   }

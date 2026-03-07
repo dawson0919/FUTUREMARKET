@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { useUser } from "@clerk/nextjs";
+import { useSession } from "next-auth/react";
 import { Search, Coins, Users, History, Gift, Send } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -33,7 +33,7 @@ interface GrantRecord {
 }
 
 export default function AdminPage() {
-  const { isSignedIn } = useUser();
+  const { data: session } = useSession();
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [history, setHistory] = useState<GrantRecord[]>([]);
   const [search, setSearch] = useState("");
@@ -73,9 +73,9 @@ export default function AdminPage() {
   }, []);
 
   useEffect(() => {
-    if (!isSignedIn) return;
+    if (!session) return;
     Promise.all([fetchUsers(""), fetchHistory()]).then(() => setLoading(false));
-  }, [isSignedIn, fetchUsers, fetchHistory]);
+  }, [session, fetchUsers, fetchHistory]);
 
   const handleSearch = () => {
     fetchUsers(search);
@@ -128,7 +128,7 @@ export default function AdminPage() {
     setGrantingAll(false);
   };
 
-  if (!isSignedIn) {
+  if (!session) {
     return (
       <div className="flex items-center justify-center py-20 text-muted-foreground">
         請先登入

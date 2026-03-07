@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useUser } from "@clerk/nextjs";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { Coins, TrendingUp, TrendingDown, Award, History, Flame, Target, Star, Zap } from "lucide-react";
 import { Card } from "@/components/ui/card";
@@ -17,7 +17,7 @@ interface PositionWithMarket extends Position {
 }
 
 export default function PortfolioPage() {
-  const { user, isSignedIn } = useUser();
+  const { data: session } = useSession();
   const { profile, loading: profileLoading } = useUserProfile();
   const [positions, setPositions] = useState<PositionWithMarket[]>([]);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -82,7 +82,7 @@ export default function PortfolioPage() {
     if (profile) fetchData();
   }, [profile]);
 
-  if (!isSignedIn) {
+  if (!session) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
         <p className="text-lg font-medium">請先登入以查看投資組合</p>

@@ -3,8 +3,8 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
-import { TrendingUp, Trophy, Briefcase, Coins, Shield } from "lucide-react";
+import { useSession, signOut } from "next-auth/react";
+import { TrendingUp, Trophy, Briefcase, Coins, Shield, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { formatChips } from "@/lib/constants";
@@ -18,6 +18,7 @@ const navItems = [
 
 export function Header() {
   const pathname = usePathname();
+  const { data: session } = useSession();
   const { profile } = useUserProfile();
   const [mounted, setMounted] = useState(false);
 
@@ -62,37 +63,44 @@ export function Header() {
         <div className="flex items-center gap-3">
           {mounted && (
             <>
-              <SignedIn>
-                {profile && (
-                  <div className="flex items-center gap-2 rounded-lg bg-secondary px-3 py-1.5">
-                    <Coins className="h-4 w-4 text-yellow-500" />
-                    <span className="text-sm font-semibold">
-                      {formatChips(profile.chips_balance)}
-                    </span>
-                  </div>
-                )}
-                {profile?.is_admin && (
-                  <Link
-                    href="/admin"
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-500/10 text-red-400 text-xs font-semibold hover:bg-red-500/20 transition-colors"
+              {session ? (
+                <>
+                  {profile && (
+                    <div className="flex items-center gap-2 rounded-lg bg-secondary px-3 py-1.5">
+                      <Coins className="h-4 w-4 text-yellow-500" />
+                      <span className="text-sm font-semibold">
+                        {formatChips(profile.chips_balance)}
+                      </span>
+                    </div>
+                  )}
+                  {profile?.is_admin && (
+                    <Link
+                      href="/admin"
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-500/10 text-red-400 text-xs font-semibold hover:bg-red-500/20 transition-colors"
+                    >
+                      <Shield className="h-3.5 w-3.5" />
+                      管理
+                    </Link>
+                  )}
+                  <button
+                    onClick={() => signOut({ callbackUrl: "/sign-in" })}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent/50 text-sm transition-colors"
                   >
-                    <Shield className="h-3.5 w-3.5" />
-                    管理
-                  </Link>
-                )}
-                <UserButton
-                  appearance={{
-                    elements: {
-                      avatarBox: "h-8 w-8",
-                    },
-                  }}
-                />
-              </SignedIn>
-              <SignedOut>
+                    {session.user?.image ? (
+                      <img src={session.user.image} alt="" className="h-6 w-6 rounded-full" />
+                    ) : (
+                      <div className="h-6 w-6 rounded-full bg-secondary flex items-center justify-center text-xs font-bold">
+                        {(session.user?.name || "?")[0]}
+                      </div>
+                    )}
+                    <LogOut className="h-3.5 w-3.5 hidden md:block" />
+                  </button>
+                </>
+              ) : (
                 <Link href="/sign-in">
                   <Button size="sm">登入</Button>
                 </Link>
-              </SignedOut>
+              )}
             </>
           )}
         </div>

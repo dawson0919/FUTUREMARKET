@@ -1,7 +1,7 @@
 "use client";
 
 import { use, useEffect, useState, useCallback } from "react";
-import { useUser } from "@clerk/nextjs";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { ArrowLeft, ArrowUp, Bookmark, Share2, Loader2 } from "lucide-react";
 import { Card } from "@/components/ui/card";
@@ -36,7 +36,7 @@ export default function InstrumentPage({
   const inst = INSTRUMENTS.find((i) => i.symbol === upperSymbol);
   const color = INSTRUMENT_COLORS[upperSymbol] || "#7c3aed";
   const { prices } = usePrices();
-  const { isSignedIn } = useUser();
+  const { data: session } = useSession();
   const { profile, refreshProfile } = useUserProfile();
 
   const [markets, setMarkets] = useState<Market[]>([]);
@@ -241,7 +241,7 @@ export default function InstrumentPage({
                   {/* Buy Yes */}
                   <div className="flex justify-center">
                     <button
-                      disabled={!bettable || !isSignedIn}
+                      disabled={!bettable || !session}
                       onClick={() => selectMarket(market, "yes")}
                       className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all min-w-[120px] ${isSelected && betSide === "yes"
                           ? "bg-emerald-500 text-white"
@@ -255,7 +255,7 @@ export default function InstrumentPage({
                   {/* Buy No */}
                   <div className="flex justify-center">
                     <button
-                      disabled={!bettable || !isSignedIn}
+                      disabled={!bettable || !session}
                       onClick={() => selectMarket(market, "no")}
                       className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all min-w-[120px] ${isSelected && betSide === "no"
                           ? "bg-red-500 text-white"
@@ -467,7 +467,7 @@ export default function InstrumentPage({
                   {/* Submit */}
                   <Button
                     onClick={handleBet}
-                    disabled={betLoading || !parseInt(betAmount) || !isSignedIn}
+                    disabled={betLoading || !parseInt(betAmount) || !session}
                     className={`w-full py-6 text-base font-bold ${betSide === "yes"
                         ? "bg-blue-600 hover:bg-blue-700"
                         : "bg-red-500 hover:bg-red-600"

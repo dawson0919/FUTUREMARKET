@@ -1,7 +1,7 @@
 "use client";
 
 import { use, useEffect, useState } from "react";
-import { useUser } from "@clerk/nextjs";
+import { useSession } from "next-auth/react";
 import { ArrowLeft, ExternalLink, TrendingUp, Users, Clock, BookOpen, Shield, Info } from "lucide-react";
 import Link from "next/link";
 import { Card } from "@/components/ui/card";
@@ -19,17 +19,17 @@ export default function MarketPage({ params }: { params: Promise<{ id: string }>
   const { id } = use(params);
   const { market, loading, refreshMarket } = useMarket(id);
   const { prices } = usePrices();
-  const { user } = useUser();
+  const { data: session } = useSession();
   const [positions, setPositions] = useState<Position[]>([]);
 
   useEffect(() => {
     async function fetchPositions() {
-      if (!user || !market) return;
+      if (!session?.user?.id || !market) return;
 
       const { data: profile } = await supabase
         .from("profiles")
         .select("id")
-        .eq("clerk_id", user.id)
+        .eq("clerk_id", session.user.id)
         .single();
 
       if (profile) {
@@ -43,7 +43,7 @@ export default function MarketPage({ params }: { params: Promise<{ id: string }>
       }
     }
     fetchPositions();
-  }, [user, market]);
+  }, [session, market]);
 
   if (loading || !market) {
     return (

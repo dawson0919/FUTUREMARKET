@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { useUser } from "@clerk/nextjs";
+import { useSession } from "next-auth/react";
 import { useToast } from "@/components/ui/toast-notification";
 import { formatChips } from "@/lib/constants";
 
@@ -14,12 +14,12 @@ interface SettlementResult {
 }
 
 export function SettlementNotifier() {
-  const { isSignedIn } = useUser();
+  const { data: session } = useSession();
   const { showToast } = useToast();
   const checked = useRef(false);
 
   useEffect(() => {
-    if (!isSignedIn || checked.current) return;
+    if (!session || checked.current) return;
     checked.current = true;
 
     async function checkResults() {
@@ -67,7 +67,7 @@ export function SettlementNotifier() {
     // Small delay to let the page load first
     const timer = setTimeout(checkResults, 1500);
     return () => clearTimeout(timer);
-  }, [isSignedIn, showToast]);
+  }, [session, showToast]);
 
   return null;
 }
