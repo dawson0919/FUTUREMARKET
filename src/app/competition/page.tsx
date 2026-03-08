@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { Trophy, Calendar, Coins, Target, Users, TrendingUp, Award } from "lucide-react";
 import { Card } from "@/components/ui/card";
+import { CompetitionCountdown } from "@/components/competition/CompetitionCountdown";
 
 export default function CompetitionPage() {
   return (
@@ -27,7 +28,11 @@ export default function CompetitionPage() {
             刀神的海期教室
           </h1>
           <h2 className="text-xl font-bold text-white mb-2">預測投注比賽</h2>
-          <p className="text-amber-500/80 text-sm mb-8">THE FUTURE MARKET · 第一屆</p>
+          <p className="text-amber-500/80 text-sm mb-4">THE FUTURE MARKET · 第一屆</p>
+          <div className="flex flex-col items-center gap-1 mb-8">
+            <span className="text-xs text-amber-600 font-semibold uppercase tracking-wider">距離結束</span>
+            <CompetitionCountdown />
+          </div>
 
           {/* Stats row */}
           <div className="grid grid-cols-3 gap-3 mb-8">

@@ -39,6 +39,20 @@ jobs:
           echo ""
           echo "Market creation triggered at $(date -u)"
 
+  snapshot-ranks:
+    runs-on: ubuntu-latest
+    if: github.event.schedule == '5 0 * * *' || github.event_name == 'workflow_dispatch'
+    steps:
+      - name: Trigger snapshot-ranks
+        run: |
+          curl -s -X POST \
+            "https://futuremarket-production.up.railway.app/api/cron/snapshot-ranks" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            -H "Content-Type: application/json" \
+            --max-time 60
+          echo ""
+          echo "Rank snapshot triggered at $(date -u)"
+
   settle-competition:
     runs-on: ubuntu-latest
     # 只在 4/10 00:30 UTC 結算比賽冠軍

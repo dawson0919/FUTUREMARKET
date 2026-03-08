@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { TrendingUp, ChevronRight } from "lucide-react";
+import { CompetitionCountdown } from "@/components/competition/CompetitionCountdown";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { UpDownCard } from "@/components/market/UpDownCard";
@@ -167,11 +168,15 @@ export default function HomePage() {
             <p className="text-base font-bold text-amber-100 mb-0.5">
               第一屆 刀神的海期教室 預測投注比賽
             </p>
-            <p className="text-sm text-amber-200/80 mb-3">
+            <p className="text-sm text-amber-200/80 mb-2">
               3/10 開始 → 4/10 結算 · 排名第一名獲得
               <span className="text-amber-300 font-bold"> 500 USDT </span>
               獎金！
             </p>
+            <div className="flex items-center gap-2 mb-3">
+              <span className="text-xs text-amber-500 font-semibold">距離結束</span>
+              <CompetitionCountdown />
+            </div>
             <div className="flex flex-wrap gap-3 text-xs">
               <div className="flex items-center gap-1.5 bg-black/30 rounded-lg px-3 py-1.5 border border-amber-500/20">
                 <span className="text-amber-400">📅</span>

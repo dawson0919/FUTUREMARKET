@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { Trophy, Medal, Crown } from "lucide-react";
+import { Trophy, Medal, Crown, TrendingUp, TrendingDown, Minus } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import type { LeaderboardEntry, PeriodicLeaderboardEntry } from "@/types";
@@ -38,6 +38,7 @@ interface DisplayEntry {
   profit: number;
   trades: number;
   win_rate: number;
+  rank_change?: number | null;
 }
 
 export default function LeaderboardPage() {
@@ -61,7 +62,7 @@ export default function LeaderboardPage() {
         const data = await res.json();
         if (data.leaderboard) {
           setDisplayEntries(
-            (data.leaderboard as LeaderboardEntry[]).map((e) => ({
+            (data.leaderboard as (LeaderboardEntry & { rank_change?: number | null })[]).map((e) => ({
               id: e.id,
               username: e.username,
               avatar_url: e.avatar_url,
@@ -69,6 +70,7 @@ export default function LeaderboardPage() {
               profit: e.total_profit,
               trades: e.total_trades,
               win_rate: e.win_rate,
+              rank_change: e.rank_change ?? null,
             }))
           );
         }
@@ -230,7 +232,15 @@ export default function LeaderboardPage() {
                   key={entry.id}
                   className="grid grid-cols-[60px_1fr_120px_100px_80px] gap-4 px-6 py-3 items-center border-t border-border/30 hover:bg-accent/30 transition-colors"
                 >
-                  <div className="flex items-center justify-center">{getRankIcon(i)}</div>
+                  <div className="flex flex-col items-center gap-0.5">
+                    {getRankIcon(i)}
+                    {period === "all" && entry.rank_change !== undefined && entry.rank_change !== null && (
+                      <span className={`text-[10px] font-bold flex items-center gap-0.5 ${entry.rank_change > 0 ? "text-emerald-400" : entry.rank_change < 0 ? "text-red-400" : "text-muted-foreground"}`}>
+                        {entry.rank_change > 0 ? <TrendingUp className="h-2.5 w-2.5" /> : entry.rank_change < 0 ? <TrendingDown className="h-2.5 w-2.5" /> : <Minus className="h-2.5 w-2.5" />}
+                        {entry.rank_change !== 0 && Math.abs(entry.rank_change)}
+                      </span>
+                    )}
+                  </div>
                   <div className="flex items-center gap-3 min-w-0">
                     <Avatar className="h-8 w-8 flex-shrink-0">
                       <AvatarImage src={entry.avatar_url || ""} />
