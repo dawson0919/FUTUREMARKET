@@ -169,7 +169,7 @@ export default function HomePage() {
             </p>
             <p className="text-sm text-amber-200/80 mb-3">
               3/10 開始 → 4/10 結算 · 排名第一名獲得
-              <span className="text-amber-300 font-bold"> 1,000 USDT </span>
+              <span className="text-amber-300 font-bold"> 500 USDT </span>
               獎金！
             </p>
             <div className="flex flex-wrap gap-3 text-xs">
@@ -181,7 +181,7 @@ export default function HomePage() {
               <div className="flex items-center gap-1.5 bg-black/30 rounded-lg px-3 py-1.5 border border-amber-500/20">
                 <span className="text-amber-400">🎖️</span>
                 <span className="text-amber-200/70">冠軍獎金：</span>
-                <span className="text-amber-100 font-semibold">1,000 USDT</span>
+                <span className="text-amber-100 font-semibold">500 USDT</span>
               </div>
               <div className="flex items-center gap-1.5 bg-black/30 rounded-lg px-3 py-1.5 border border-amber-500/20">
                 <span className="text-amber-400">📊</span>

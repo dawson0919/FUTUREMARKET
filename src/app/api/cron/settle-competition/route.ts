@@ -5,7 +5,7 @@ import { getServiceSupabase } from "@/lib/supabase";
 const COMPETITION = {
   edition: 1,
   title: "第一屆 刀神的海期教室",
-  prize: "1,000 USDT",
+  prize: "500 USDT",
   start_date: "2026-03-10",
   end_date: "2026-04-10",
 };

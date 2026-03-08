@@ -2,7 +2,7 @@ import { ImageResponse } from "next/og";
 import { readFileSync } from "fs";
 import { join } from "path";
 
-export const alt = "第一屆 刀神的海期教室 預測投注比賽 — 冠軍獎金 1,000 USDT";
+export const alt = "第一屆 刀神的海期教室 預測投注比賽 — 冠軍獎金 500 USDT";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -167,7 +167,7 @@ export default async function Image() {
         <div style={{ display: "flex", gap: "32px", marginBottom: "36px" }}>
           {[
             { label: "比賽期間", value: "3/10 – 4/10" },
-            { label: "冠軍獎金", value: "1,000 USDT" },
+            { label: "冠軍獎金", value: "500 USDT" },
             { label: "評分依據", value: "最終籌碼排名" },
           ].map((item) => (
             <div

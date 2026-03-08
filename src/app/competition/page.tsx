@@ -39,7 +39,7 @@ export default function CompetitionPage() {
             <div className="rounded-xl bg-black/40 border border-amber-400/40 px-3 py-4 ring-1 ring-amber-400/20">
               <Trophy className="h-4 w-4 text-amber-400 mx-auto mb-1.5" />
               <p className="text-[10px] text-amber-700 font-bold uppercase tracking-wider mb-1">冠軍獎金</p>
-              <p className="text-base font-black text-amber-300">1,000 USDT</p>
+              <p className="text-base font-black text-amber-300">500 USDT</p>
             </div>
             <div className="rounded-xl bg-black/40 border border-amber-500/20 px-3 py-4">
               <Coins className="h-4 w-4 text-amber-500 mx-auto mb-1.5" />
@@ -93,7 +93,7 @@ export default function CompetitionPage() {
           {
             icon: <Users className="h-4 w-4 text-amber-400" />,
             title: "獎金發放",
-            desc: "冠軍 1,000 USDT，由主辦方「刀神的海期教室」聯繫冠軍發放"
+            desc: "冠軍 500 USDT，由主辦方「刀神的海期教室」聯繫冠軍發放"
           },
         ].map((rule, i) => (
           <div key={i} className="flex gap-3 rounded-xl bg-card border border-border/50 px-4 py-3">
