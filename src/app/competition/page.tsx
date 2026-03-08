@@ -93,7 +93,12 @@ export default function CompetitionPage() {
           {
             icon: <Users className="h-4 w-4 text-amber-400" />,
             title: "獎金發放",
-            desc: "冠軍 500 USDT，由主辦方「刀神的海期教室」聯繫冠軍發放"
+            desc: "冠軍 500 USDT，由主辦方「刀神的海期教室」聯繫冠軍，以 PIONEX 派網帳號 UID 收款"
+          },
+          {
+            icon: <Calendar className="h-4 w-4 text-amber-400" />,
+            title: "領獎期限",
+            desc: "冠軍須於結算後 7 日內回覆主辦方並提供 PIONEX 派網帳號 UID，逾期視為放棄獎金"
           },
         ].map((rule, i) => (
           <div key={i} className="flex gap-3 rounded-xl bg-card border border-border/50 px-4 py-3">
