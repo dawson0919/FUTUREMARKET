@@ -187,6 +187,12 @@ export default function HomePage() {
                 <span className="text-amber-400">📊</span>
                 <span className="text-amber-200/70">以 4/10 排行榜排名為準</span>
               </div>
+              <Link
+                href="/competition"
+                className="flex items-center gap-1.5 bg-amber-500/20 hover:bg-amber-500/30 transition-colors rounded-lg px-3 py-1.5 border border-amber-500/30"
+              >
+                <span className="text-amber-300 font-bold">查看詳情 →</span>
+              </Link>
             </div>
           </div>
         </div>
