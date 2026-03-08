@@ -71,9 +71,11 @@ export async function POST(
   );
 
   // Atomic balance deduction — prevents race condition double-spend
-  const { data: deductResult, error: deductError } = await db
+  const { data: deductRaw, error: deductError } = await db
     .rpc("deduct_chips", { p_user_id: profile.id, p_amount: amount })
     .single();
+
+  const deductResult = deductRaw as { new_balance: number; success: boolean } | null;
 
   if (deductError || !deductResult || !deductResult.success) {
     return NextResponse.json({ error: "Insufficient chips" }, { status: 400 });
