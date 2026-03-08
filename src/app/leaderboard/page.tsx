@@ -1,11 +1,25 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { Trophy, Medal } from "lucide-react";
+import { Trophy, Medal, Crown } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import type { LeaderboardEntry, PeriodicLeaderboardEntry } from "@/types";
 import { formatChips } from "@/lib/constants";
+
+interface Champion {
+  id: number;
+  edition: number;
+  title: string;
+  prize: string;
+  start_date: string;
+  end_date: string;
+  champion_username: string | null;
+  champion_avatar_url: string | null;
+  final_chips: number;
+  total_trades: number;
+  wins: number;
+}
 
 type Period = "all" | "week" | "month";
 
@@ -30,6 +44,14 @@ export default function LeaderboardPage() {
   const [period, setPeriod] = useState<Period>("all");
   const [displayEntries, setDisplayEntries] = useState<DisplayEntry[]>([]);
   const [loading, setLoading] = useState(true);
+  const [champions, setChampions] = useState<Champion[]>([]);
+
+  useEffect(() => {
+    fetch("/api/champions")
+      .then((r) => r.json())
+      .then((d) => setChampions(d.champions || []))
+      .catch(() => {});
+  }, []);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -243,6 +265,50 @@ export default function LeaderboardPage() {
           </Card>
           <p className="text-center text-xs text-muted-foreground mt-4">僅顯示前 10 名</p>
         </>
+      )}
+
+      {/* Hall of Champions */}
+      {champions.length > 0 && (
+        <div className="mt-12 pt-8 border-t border-border/30">
+          <div className="flex items-center gap-2 mb-6">
+            <Crown className="h-5 w-5 text-amber-400" />
+            <h2 className="text-xl font-bold">歷屆冠軍名人堂</h2>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {champions.map((c) => (
+              <Card key={c.id} className="p-5 border-amber-500/30 bg-gradient-to-br from-amber-950/30 to-transparent">
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30">
+                    第 {c.edition} 屆
+                  </span>
+                  <span className="text-xs text-muted-foreground truncate">{c.title}</span>
+                </div>
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="relative">
+                    <Avatar className="h-12 w-12 ring-2 ring-amber-500/40">
+                      <AvatarImage src={c.champion_avatar_url || ""} />
+                      <AvatarFallback className="bg-amber-500/20 text-amber-300 font-bold">
+                        {(c.champion_username || "?")[0]?.toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                    <Trophy className="absolute -top-1 -right-1 h-4 w-4 text-amber-400" />
+                  </div>
+                  <div>
+                    <p className="font-bold text-amber-100">{c.champion_username || "匿名"}</p>
+                    <p className="text-xs text-amber-400 font-semibold">{formatChips(c.final_chips)} 籌碼</p>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between text-xs text-muted-foreground">
+                  <span>{c.total_trades} 筆交易 · 勝 {c.wins} 場</span>
+                  <span className="text-amber-400 font-semibold">🏆 {c.prize}</span>
+                </div>
+                <p className="text-[10px] text-muted-foreground mt-2">
+                  {new Date(c.start_date).toLocaleDateString("zh-TW")} – {new Date(c.end_date).toLocaleDateString("zh-TW")}
+                </p>
+              </Card>
+            ))}
+          </div>
+        </div>
       )}
     </div>
   );

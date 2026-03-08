@@ -6,6 +6,8 @@ on:
     - cron: '5 21 * * 1-5'
     # 00:05 UTC — 加密貨幣收盤後結算 + 建立新市場（台灣 08:05）
     - cron: '5 0 * * *'
+    # 00:30 UTC Apr 10 — 第一屆比賽冠軍結算（台灣 08:30）
+    - cron: '30 0 10 4 *'
   workflow_dispatch: # 允許手動觸發
 
 jobs:
@@ -36,3 +38,18 @@ jobs:
             --max-time 60
           echo ""
           echo "Market creation triggered at $(date -u)"
+
+  settle-competition:
+    runs-on: ubuntu-latest
+    # 只在 4/10 00:30 UTC 結算比賽冠軍
+    if: github.event.schedule == '30 0 10 4 *' || github.event_name == 'workflow_dispatch'
+    steps:
+      - name: Trigger settle-competition
+        run: |
+          curl -s -X POST \
+            "https://futuremarket-production.up.railway.app/api/cron/settle-competition" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            -H "Content-Type: application/json" \
+            --max-time 60
+          echo ""
+          echo "Competition settlement triggered at $(date -u)"
