@@ -25,4 +25,10 @@ export const authOptions: NextAuthOptions = {
   pages: {
     signIn: "/sign-in",
   },
+  debug: true,
+  logger: {
+    error(code, metadata) {
+      console.error("[NextAuth Error]", code, metadata);
+    },
+  },
 };
