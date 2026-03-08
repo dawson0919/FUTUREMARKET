@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { useSession } from "next-auth/react";
-import { Search, Coins, Users, History, Gift, Send } from "lucide-react";
+import { Search, Coins, Users, History, Gift, Send, RotateCcw } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -51,6 +51,10 @@ export default function AdminPage() {
   const [grantAllAmount, setGrantAllAmount] = useState("");
   const [grantAllNote, setGrantAllNote] = useState("");
   const [grantingAll, setGrantingAll] = useState(false);
+
+  // Reset chips state
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
+  const [resetting, setResetting] = useState(false);
 
   const fetchUsers = useCallback(async (q: string) => {
     const res = await fetch(`/api/admin/users?search=${encodeURIComponent(q)}`, {
@@ -102,6 +106,21 @@ export default function AdminPage() {
       fetchHistory();
     }
     setGranting(false);
+  };
+
+  const handleResetChips = async () => {
+    setResetting(true);
+    const res = await fetch("/api/admin/reset-chips", {
+      method: "POST",
+      credentials: "include",
+    });
+    if (res.ok) {
+      const data = await res.json();
+      alert(`成功將 ${data.reset} 位用戶籌碼重置為 ${formatChips(data.chips)}`);
+      setShowResetConfirm(false);
+      fetchUsers(search);
+    }
+    setResetting(false);
   };
 
   const handleGrantAll = async () => {
@@ -156,13 +175,23 @@ export default function AdminPage() {
     <div>
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-3xl font-bold">管理後台</h1>
-        <Button
-          onClick={() => setShowGrantAll(true)}
-          className="bg-amber-600 hover:bg-amber-700"
-        >
-          <Gift className="h-4 w-4 mr-2" />
-          全員發放
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            onClick={() => setShowResetConfirm(true)}
+            variant="outline"
+            className="border-red-500/40 text-red-400 hover:bg-red-500/10 hover:text-red-300"
+          >
+            <RotateCcw className="h-4 w-4 mr-2" />
+            比賽重置籌碼
+          </Button>
+          <Button
+            onClick={() => setShowGrantAll(true)}
+            className="bg-amber-600 hover:bg-amber-700"
+          >
+            <Gift className="h-4 w-4 mr-2" />
+            全員發放
+          </Button>
+        </div>
       </div>
 
       <Tabs defaultValue="users" className="w-full">
@@ -358,6 +387,41 @@ export default function AdminPage() {
                 onClick={handleGrant}
               >
                 {granting ? "發放中..." : `發放 ${grantAmount ? formatChips(parseInt(grantAmount)) : 0} 籌碼`}
+              </Button>
+            </div>
+          </Card>
+        </div>
+      )}
+
+      {/* Reset chips confirmation dialog */}
+      {showResetConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <Card className="w-full max-w-md p-6 border-red-500/30 mx-4">
+            <div className="flex items-center gap-3 mb-3">
+              <RotateCcw className="h-6 w-6 text-red-400" />
+              <h3 className="text-lg font-bold text-red-400">比賽籌碼重置</h3>
+            </div>
+            <p className="text-sm text-muted-foreground mb-2">
+              此操作將把 <strong className="text-foreground">所有 {users.length} 位用戶</strong> 的籌碼統一設為：
+            </p>
+            <p className="text-3xl font-bold text-amber-400 text-center my-4">100,000 籌碼</p>
+            <p className="text-xs text-red-400/80 mb-6 text-center">
+              ⚠️ 此操作不可逆，請確認比賽即將開始再執行
+            </p>
+            <div className="flex gap-2">
+              <Button
+                variant="secondary"
+                className="flex-1"
+                onClick={() => setShowResetConfirm(false)}
+              >
+                取消
+              </Button>
+              <Button
+                className="flex-1 bg-red-600 hover:bg-red-700"
+                disabled={resetting}
+                onClick={handleResetChips}
+              >
+                {resetting ? "重置中..." : "確認重置全員籌碼"}
               </Button>
             </div>
           </Card>
