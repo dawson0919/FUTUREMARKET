@@ -70,21 +70,22 @@ export async function POST(
     market.no_pool
   );
 
-  const newBalance = profile.chips_balance - amount;
+  // Atomic balance deduction — prevents race condition double-spend
+  const { data: deductResult, error: deductError } = await db
+    .rpc("deduct_chips", { p_user_id: profile.id, p_amount: amount })
+    .single();
 
-  // Update user balance
-  const { error: balanceError } = await db
-    .from("profiles")
-    .update({
-      chips_balance: newBalance,
-      total_trades: profile.total_trades + 1,
-      updated_at: new Date().toISOString(),
-    })
-    .eq("id", profile.id);
-
-  if (balanceError) {
-    return NextResponse.json({ error: "Failed to update balance" }, { status: 500 });
+  if (deductError || !deductResult || !deductResult.success) {
+    return NextResponse.json({ error: "Insufficient chips" }, { status: 400 });
   }
+
+  const newBalance = deductResult.new_balance;
+
+  // Update trade count separately
+  await db
+    .from("profiles")
+    .update({ total_trades: profile.total_trades + 1, updated_at: new Date().toISOString() })
+    .eq("id", profile.id);
 
   // Update market pools
   const poolUpdate =

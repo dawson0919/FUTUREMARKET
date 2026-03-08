@@ -154,8 +154,41 @@ export default function HomePage() {
         <p className="text-muted-foreground mb-3">
           預測期貨與加密貨幣的每日收盤價，用免費籌碼下注，登上排行榜！
         </p>
-        <div className="rounded-lg bg-purple-500/10 border border-purple-500/30 px-4 py-2.5 mb-4 text-sm text-purple-300">
-          目前封測期間，請多多測試使用，未來將舉辦比賽！
+
+        {/* Competition Banner */}
+        <div className="relative overflow-hidden rounded-xl border border-amber-500/40 bg-gradient-to-r from-amber-950/60 via-yellow-950/40 to-amber-950/60 px-5 py-4 mb-4">
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-amber-500/10 via-transparent to-transparent pointer-events-none" />
+          <div className="relative">
+            <div className="flex items-center gap-2 mb-1.5">
+              <span className="text-lg">🏆</span>
+              <span className="text-xs font-bold uppercase tracking-widest text-amber-400">比賽公告</span>
+              <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 font-semibold">進行中</span>
+            </div>
+            <p className="text-base font-bold text-amber-100 mb-0.5">
+              第一屆 刀神的海期教室 預測投注比賽
+            </p>
+            <p className="text-sm text-amber-200/80 mb-3">
+              3/10 開始 → 4/10 結算 · 排名第一名獲得
+              <span className="text-amber-300 font-bold"> 1,000 USDT </span>
+              獎金！
+            </p>
+            <div className="flex flex-wrap gap-3 text-xs">
+              <div className="flex items-center gap-1.5 bg-black/30 rounded-lg px-3 py-1.5 border border-amber-500/20">
+                <span className="text-amber-400">📅</span>
+                <span className="text-amber-200/70">比賽期間：</span>
+                <span className="text-amber-100 font-semibold">2026/3/10 – 4/10</span>
+              </div>
+              <div className="flex items-center gap-1.5 bg-black/30 rounded-lg px-3 py-1.5 border border-amber-500/20">
+                <span className="text-amber-400">🎖️</span>
+                <span className="text-amber-200/70">冠軍獎金：</span>
+                <span className="text-amber-100 font-semibold">1,000 USDT</span>
+              </div>
+              <div className="flex items-center gap-1.5 bg-black/30 rounded-lg px-3 py-1.5 border border-amber-500/20">
+                <span className="text-amber-400">📊</span>
+                <span className="text-amber-200/70">以 4/10 排行榜排名為準</span>
+              </div>
+            </div>
+          </div>
         </div>
         <div className="flex flex-wrap gap-3 text-xs mb-4">
           <div className="flex items-center gap-1.5 bg-secondary rounded-lg px-3 py-1.5">
