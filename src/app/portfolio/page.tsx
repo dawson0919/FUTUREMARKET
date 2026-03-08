@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
-import { Coins, TrendingUp, TrendingDown, Award, History, Flame, Target, Star, Zap } from "lucide-react";
+import { Coins, TrendingUp, TrendingDown, Award, History, Flame, Target, Star, Zap, Trophy, ArrowUp, ArrowDown } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -29,6 +29,9 @@ export default function PortfolioPage() {
     best_streak: number;
     checkin_streak: number;
     favorite_instrument: string | null;
+  } | null>(null);
+  const [compRank, setCompRank] = useState<{
+    rank: number; total: number; gap_from_top: number; gap_to_next: number; rank_change: number | null;
   } | null>(null);
 
   useEffect(() => {
@@ -67,11 +70,16 @@ export default function PortfolioPage() {
       }
       if (txResult.data) setTransactions(txResult.data);
 
-      // Fetch detailed stats
+      // Fetch detailed stats + competition rank
       try {
-        const statsRes = await fetch("/api/user/stats", { credentials: "include" });
+        const [statsRes, rankRes] = await Promise.all([
+          fetch("/api/user/stats", { credentials: "include" }),
+          fetch("/api/user/competition-rank", { credentials: "include" }),
+        ]);
         const statsData = await statsRes.json();
         if (statsData.stats) setStats(statsData.stats);
+        const rankData = await rankRes.json();
+        if (rankData.rank) setCompRank(rankData);
       } catch {
         // Non-critical
       }
@@ -179,12 +187,17 @@ export default function PortfolioPage() {
               {formatChips(stats.worst_trade)}
             </p>
           </Card>
-          <Card className="p-4 border-border/50">
+          <Card className={`p-4 border-border/50 ${stats.current_streak >= 3 ? "border-orange-500/40 bg-orange-500/5" : ""}`}>
             <div className="flex items-center gap-2 text-muted-foreground mb-1">
               <Zap className="h-4 w-4 text-yellow-400" />
               <span className="text-xs">當前連勝</span>
+              {stats.current_streak >= 10 && <span className="text-xs">💎</span>}
+              {stats.current_streak >= 3 && stats.current_streak < 10 && <span className="text-xs">🔥</span>}
             </div>
-            <p className="text-lg font-bold">{stats.current_streak}</p>
+            <p className={`text-lg font-bold ${stats.current_streak >= 3 ? "text-orange-400" : ""}`}>
+              {stats.current_streak}
+              {stats.current_streak >= 3 && <span className="text-xs ml-1 text-orange-500">連勝！</span>}
+            </p>
           </Card>
           <Card className="p-4 border-border/50">
             <div className="flex items-center gap-2 text-muted-foreground mb-1">
@@ -201,6 +214,38 @@ export default function PortfolioPage() {
             <p className="text-lg font-bold">{stats.favorite_instrument || "-"}</p>
           </Card>
         </div>
+      )}
+
+      {/* Competition Rank Card */}
+      {compRank && (
+        <Card className="border-amber-500/30 bg-gradient-to-r from-amber-950/40 to-black mb-6 p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <Trophy className="h-4 w-4 text-amber-400" />
+            <span className="text-sm font-bold text-amber-300">第一屆比賽排名</span>
+            {compRank.rank_change !== null && compRank.rank_change !== 0 && (
+              <span className={`flex items-center gap-0.5 text-xs font-bold ${compRank.rank_change > 0 ? "text-emerald-400" : "text-red-400"}`}>
+                {compRank.rank_change > 0 ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />}
+                {Math.abs(compRank.rank_change)}
+              </span>
+            )}
+          </div>
+          <div className="grid grid-cols-3 gap-3">
+            <div className="text-center">
+              <p className="text-3xl font-black text-amber-300">#{compRank.rank}</p>
+              <p className="text-xs text-amber-700">共 {compRank.total} 人</p>
+            </div>
+            <div className="text-center border-x border-amber-500/20">
+              <p className="text-lg font-bold text-red-400">-{formatChips(compRank.gap_from_top)}</p>
+              <p className="text-xs text-muted-foreground">距第一名</p>
+            </div>
+            <div className="text-center">
+              <p className="text-lg font-bold text-emerald-400">
+                {compRank.rank === 1 ? "🏆 領先" : `-${formatChips(compRank.gap_to_next)}`}
+              </p>
+              <p className="text-xs text-muted-foreground">{compRank.rank === 1 ? "你是第一名！" : "距上一名"}</p>
+            </div>
+          </div>
+        </Card>
       )}
 
       <Tabs defaultValue="open" className="w-full">

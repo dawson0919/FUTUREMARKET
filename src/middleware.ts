@@ -17,6 +17,8 @@ const PUBLIC_PATHS = [
   "/opengraph-image",
   "/competition",
   "/api/champions",
+  "/api/markets/yesterday-results",
+  "/api/competition/top3",
 ];
 
 export function middleware(request: NextRequest) {

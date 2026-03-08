@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { TrendingUp, ChevronRight } from "lucide-react";
 import { CompetitionCountdown } from "@/components/competition/CompetitionCountdown";
@@ -28,6 +28,13 @@ export default function HomePage() {
   const [updownMarkets, setUpdownMarkets] = useState<Market[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<"all" | "crypto" | "futures">("all");
+  const [top3, setTop3] = useState<{ id: string; username: string | null; chips_balance: number }[]>([]);
+  const [yesterdayResults, setYesterdayResults] = useState<{ id: string; question: string; result: string | null; yes_pct: number; symbol: string; icon: string }[]>([]);
+
+  useEffect(() => {
+    fetch("/api/competition/top3").then(r => r.json()).then(d => setTop3(d.top3 || [])).catch(() => {});
+    fetch("/api/markets/yesterday-results").then(r => r.json()).then(d => setYesterdayResults(d.markets || [])).catch(() => {});
+  }, []);
 
   useEffect(() => {
     async function fetchMarkets() {
@@ -199,8 +206,47 @@ export default function HomePage() {
                 <span className="text-amber-300 font-bold">查看詳情 →</span>
               </Link>
             </div>
+            {/* Live Top 3 */}
+            {top3.length > 0 && (
+              <div className="mt-3 pt-3 border-t border-amber-500/20">
+                <p className="text-[10px] font-bold uppercase tracking-widest text-amber-600 mb-2">即時排行 TOP 3</p>
+                <div className="flex flex-col gap-1">
+                  {top3.map((u, i) => (
+                    <div key={u.id} className="flex items-center gap-2">
+                      <span className="text-xs w-5">{i === 0 ? "🥇" : i === 1 ? "🥈" : "🥉"}</span>
+                      <span className="text-xs text-amber-100 font-medium truncate flex-1">{u.username || "匿名"}</span>
+                      <span className="text-xs font-bold text-amber-300">{u.chips_balance.toLocaleString()}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
+
+        {/* Yesterday Results */}
+        {yesterdayResults.length > 0 && (
+          <div className="mb-4 rounded-xl border border-border/50 bg-card overflow-hidden">
+            <div className="flex items-center gap-2 px-4 py-2.5 bg-secondary/50 border-b border-border/30">
+              <span className="text-xs font-bold">昨日結算</span>
+              <span className="text-xs text-muted-foreground">{yesterdayResults.length} 個市場</span>
+            </div>
+            <div className="divide-y divide-border/20">
+              {yesterdayResults.slice(0, 5).map((m) => (
+                <div key={m.id} className="flex items-center gap-3 px-4 py-2">
+                  <span className="text-sm">{m.icon}</span>
+                  <p className="flex-1 text-xs text-muted-foreground truncate">{m.question}</p>
+                  <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full flex-shrink-0 ${
+                    m.result === "yes" ? "bg-emerald-500/15 text-emerald-400" : "bg-red-500/15 text-red-400"
+                  }`}>
+                    {m.result === "yes" ? `YES ${m.yes_pct}%` : `NO ${100 - m.yes_pct}%`}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         <div className="flex flex-wrap gap-3 text-xs mb-4">
           <div className="flex items-center gap-1.5 bg-secondary rounded-lg px-3 py-1.5">
             <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
