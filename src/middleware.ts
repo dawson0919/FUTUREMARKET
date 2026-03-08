@@ -15,6 +15,8 @@ const PUBLIC_PATHS = [
   "/instrument",
   "/market",
   "/opengraph-image",
+  "/competition",
+  "/api/champions",
 ];
 
 export function middleware(request: NextRequest) {
