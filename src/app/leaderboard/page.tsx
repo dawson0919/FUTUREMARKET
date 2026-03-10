@@ -1,10 +1,9 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { Trophy, Medal, Crown, TrendingUp, TrendingDown, Minus } from "lucide-react";
+import { Trophy, Medal, Crown, TrendingUp, TrendingDown, Minus, Coins } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import type { LeaderboardEntry, PeriodicLeaderboardEntry } from "@/types";
 import { formatChips } from "@/lib/constants";
 
 interface Champion {
@@ -21,29 +20,19 @@ interface Champion {
   wins: number;
 }
 
-type Period = "all" | "week" | "month";
-
-const PERIOD_LABELS: Record<Period, string> = {
-  all: "全部時間",
-  week: "本週",
-  month: "本月",
-};
-
-// Unified entry shape for rendering
-interface DisplayEntry {
+interface LeaderEntry {
   id: string;
   username: string | null;
   avatar_url: string | null;
   chips_balance: number;
-  profit: number;
-  trades: number;
+  total_trades: number;
+  wins: number;
   win_rate: number;
-  rank_change?: number | null;
+  rank_change: number | null;
 }
 
 export default function LeaderboardPage() {
-  const [period, setPeriod] = useState<Period>("all");
-  const [displayEntries, setDisplayEntries] = useState<DisplayEntry[]>([]);
+  const [entries, setEntries] = useState<LeaderEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [champions, setChampions] = useState<Champion[]>([]);
 
@@ -57,50 +46,15 @@ export default function LeaderboardPage() {
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      if (period === "all") {
-        const res = await fetch("/api/leaderboard");
-        const data = await res.json();
-        if (data.leaderboard) {
-          setDisplayEntries(
-            (data.leaderboard as (LeaderboardEntry & { rank_change?: number | null })[]).map((e) => ({
-              id: e.id,
-              username: e.username,
-              avatar_url: e.avatar_url,
-              chips_balance: e.chips_balance,
-              profit: e.total_profit,
-              trades: e.total_trades,
-              win_rate: e.win_rate,
-              rank_change: e.rank_change ?? null,
-            }))
-          );
-        }
-      } else {
-        const res = await fetch(`/api/leaderboard/periodic?period=${period}`);
-        const data = await res.json();
-        if (data.leaderboard) {
-          setDisplayEntries(
-            (data.leaderboard as PeriodicLeaderboardEntry[]).map((e) => ({
-              id: e.id,
-              username: e.username,
-              avatar_url: e.avatar_url,
-              chips_balance: e.chips_balance,
-              profit: e.period_profit,
-              trades: e.period_trades,
-              win_rate: e.period_trades > 0
-                ? Math.round((e.period_wins / e.period_trades) * 100)
-                : 0,
-            }))
-          );
-        } else {
-          setDisplayEntries([]);
-        }
-      }
+      const res = await fetch("/api/leaderboard");
+      const data = await res.json();
+      setEntries(data.leaderboard || []);
     } catch {
       console.error("Failed to fetch leaderboard");
     } finally {
       setLoading(false);
     }
-  }, [period]);
+  }, []);
 
   useEffect(() => {
     fetchData();
@@ -125,34 +79,11 @@ export default function LeaderboardPage() {
 
   return (
     <div>
-      <div className="flex items-start justify-between mb-8">
-        <div>
-          <h1 className="text-3xl font-bold mb-2">排行榜</h1>
-          <p className="text-muted-foreground">
-            {period === "all"
-              ? "依據總盈虧排名，展現你的預測實力！"
-              : period === "week"
-              ? "本週獲利排名，每週一重置"
-              : "本月獲利排名，每月1日重置"}
-          </p>
-        </div>
-
-        {/* Period tabs */}
-        <div className="flex gap-1 bg-secondary rounded-lg p-1">
-          {(["all", "week", "month"] as Period[]).map((p) => (
-            <button
-              key={p}
-              onClick={() => setPeriod(p)}
-              className={`px-4 py-2 rounded-md text-sm font-semibold transition-colors ${
-                period === p
-                  ? "bg-primary text-primary-foreground"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              {PERIOD_LABELS[p]}
-            </button>
-          ))}
-        </div>
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold mb-2">排行榜</h1>
+        <p className="text-muted-foreground">
+          依據累積籌碼排名 · 第一屆比賽進行中
+        </p>
       </div>
 
       {loading ? (
@@ -162,10 +93,10 @@ export default function LeaderboardPage() {
       ) : (
         <>
           {/* Top 3 podium */}
-          {displayEntries.length >= 3 && (
+          {entries.length >= 3 && (
             <div className="grid grid-cols-3 gap-4 mb-8">
               {[1, 0, 2].map((idx) => {
-                const entry = displayEntries[idx];
+                const entry = entries[idx];
                 if (!entry) return null;
                 const isFirst = idx === 0;
                 return (
@@ -189,17 +120,15 @@ export default function LeaderboardPage() {
                         <p className="font-semibold text-sm truncate max-w-[120px]">
                           {entry.username || "匿名"}
                         </p>
-                        <p
-                          className={`text-lg font-bold ${
-                            entry.profit >= 0 ? "text-emerald-400" : "text-red-400"
-                          }`}
-                        >
-                          {entry.profit >= 0 ? "+" : ""}
-                          {formatChips(entry.profit)}
-                        </p>
+                        <div className="flex items-center justify-center gap-1 mt-1">
+                          <Coins className="h-4 w-4 text-yellow-500" />
+                          <span className="text-lg font-bold text-amber-300">
+                            {formatChips(entry.chips_balance)}
+                          </span>
+                        </div>
                       </div>
                       <div className="flex gap-3 text-xs text-muted-foreground">
-                        <span>{entry.trades} 筆交易</span>
+                        <span>{entry.total_trades} 筆交易</span>
                         <span>勝率 {entry.win_rate}%</span>
                       </div>
                     </div>
@@ -211,30 +140,25 @@ export default function LeaderboardPage() {
 
           {/* Full list */}
           <Card className="border-border/50 overflow-hidden">
-            <div className="grid grid-cols-[60px_1fr_120px_100px_80px] gap-4 px-6 py-3 bg-secondary text-xs font-medium text-muted-foreground">
+            <div className="grid grid-cols-[60px_1fr_120px_80px] gap-4 px-6 py-3 bg-secondary text-xs font-medium text-muted-foreground">
               <span>排名</span>
               <span>玩家</span>
-              <span className="text-right">
-                {period === "all" ? "總盈虧" : `${PERIOD_LABELS[period]}盈虧`}
-              </span>
-              <span className="text-right">餘額</span>
+              <span className="text-right">籌碼</span>
               <span className="text-right">勝率</span>
             </div>
-            {displayEntries.length === 0 ? (
+            {entries.length === 0 ? (
               <div className="py-12 text-center text-muted-foreground">
-                {period === "all"
-                  ? "還沒有玩家，成為第一個吧！"
-                  : `${PERIOD_LABELS[period]}還沒有交易紀錄`}
+                還沒有玩家，成為第一個吧！
               </div>
             ) : (
-              displayEntries.map((entry, i) => (
+              entries.map((entry, i) => (
                 <div
                   key={entry.id}
-                  className="grid grid-cols-[60px_1fr_120px_100px_80px] gap-4 px-6 py-3 items-center border-t border-border/30 hover:bg-accent/30 transition-colors"
+                  className="grid grid-cols-[60px_1fr_120px_80px] gap-4 px-6 py-3 items-center border-t border-border/30 hover:bg-accent/30 transition-colors"
                 >
                   <div className="flex flex-col items-center gap-0.5">
                     {getRankIcon(i)}
-                    {period === "all" && entry.rank_change !== undefined && entry.rank_change !== null && (
+                    {entry.rank_change !== null && (
                       <span className={`text-[10px] font-bold flex items-center gap-0.5 ${entry.rank_change > 0 ? "text-emerald-400" : entry.rank_change < 0 ? "text-red-400" : "text-muted-foreground"}`}>
                         {entry.rank_change > 0 ? <TrendingUp className="h-2.5 w-2.5" /> : entry.rank_change < 0 ? <TrendingDown className="h-2.5 w-2.5" /> : <Minus className="h-2.5 w-2.5" />}
                         {entry.rank_change !== 0 && Math.abs(entry.rank_change)}
@@ -253,27 +177,21 @@ export default function LeaderboardPage() {
                         {entry.username || "匿名"}
                       </p>
                       <p className="text-xs text-muted-foreground">
-                        {entry.trades} 筆交易
+                        {entry.total_trades} 筆交易
                       </p>
                     </div>
                   </div>
                   <div className="text-right">
-                    <span
-                      className={`text-sm font-semibold ${
-                        entry.profit >= 0 ? "text-emerald-400" : "text-red-400"
-                      }`}
-                    >
-                      {entry.profit >= 0 ? "+" : ""}
-                      {formatChips(entry.profit)}
+                    <span className="text-sm font-bold text-amber-300">
+                      {formatChips(entry.chips_balance)}
                     </span>
                   </div>
-                  <div className="text-right text-sm">{formatChips(entry.chips_balance)}</div>
                   <div className="text-right text-sm">{entry.win_rate}%</div>
                 </div>
               ))
             )}
           </Card>
-          <p className="text-center text-xs text-muted-foreground mt-4">僅顯示前 10 名</p>
+          <p className="text-center text-xs text-muted-foreground mt-4">顯示前 50 名</p>
         </>
       )}
 
