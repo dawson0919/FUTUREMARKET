@@ -2,18 +2,20 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Trophy, Medal, ChevronRight, Crown } from "lucide-react";
+import { Trophy, Medal, ChevronRight, Crown, Coins } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { formatChips } from "@/lib/constants";
-import type { PeriodicLeaderboardEntry } from "@/types";
 
-type Period = "week" | "month";
-
-const PERIOD_LABELS: Record<Period, string> = {
-  week: "本週",
-  month: "本月",
-};
+interface LeaderEntry {
+  id: string;
+  username: string | null;
+  avatar_url: string | null;
+  chips_balance: number;
+  total_trades: number;
+  wins: number;
+  win_rate: number;
+}
 
 function getRankDecoration(index: number) {
   switch (index) {
@@ -29,15 +31,14 @@ function getRankDecoration(index: number) {
 }
 
 export function TopWinnersCard() {
-  const [period, setPeriod] = useState<Period>("week");
-  const [entries, setEntries] = useState<PeriodicLeaderboardEntry[]>([]);
+  const [entries, setEntries] = useState<LeaderEntry[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchData() {
       setLoading(true);
       try {
-        const res = await fetch(`/api/leaderboard/periodic?period=${period}`);
+        const res = await fetch("/api/leaderboard");
         const data = await res.json();
         if (data.leaderboard) setEntries(data.leaderboard.slice(0, 3));
         else setEntries([]);
@@ -48,7 +49,7 @@ export function TopWinnersCard() {
       }
     }
     fetchData();
-  }, [period]);
+  }, []);
 
   return (
     <Card className="border-border/50 overflow-hidden mb-6">
@@ -56,24 +57,7 @@ export function TopWinnersCard() {
       <div className="flex items-center justify-between px-5 pt-5 pb-3">
         <div className="flex items-center gap-2">
           <Trophy className="h-5 w-5 text-yellow-400" />
-          <h2 className="font-bold text-base">獲利排行榜</h2>
-        </div>
-
-        {/* Period tabs */}
-        <div className="flex gap-1 bg-secondary rounded-lg p-0.5">
-          {(["week", "month"] as Period[]).map((p) => (
-            <button
-              key={p}
-              onClick={() => setPeriod(p)}
-              className={`px-3 py-1 rounded-md text-xs font-semibold transition-colors ${
-                period === p
-                  ? "bg-primary text-primary-foreground"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              {PERIOD_LABELS[p]}
-            </button>
-          ))}
+          <h2 className="font-bold text-base">籌碼排行榜</h2>
         </div>
       </div>
 
@@ -85,7 +69,7 @@ export function TopWinnersCard() {
           </div>
         ) : entries.length === 0 ? (
           <div className="text-center py-6 text-sm text-muted-foreground">
-            {PERIOD_LABELS[period]}還沒有交易紀錄
+            還沒有玩家，成為第一個吧！
           </div>
         ) : (
           <div className="space-y-2">
@@ -115,22 +99,15 @@ export function TopWinnersCard() {
                       {entry.username || "匿名"}
                     </p>
                     <p className="text-xs text-muted-foreground">
-                      {entry.period_trades} 筆交易 · 勝率{" "}
-                      {entry.period_trades > 0
-                        ? Math.round((entry.period_wins / entry.period_trades) * 100)
-                        : 0}%
+                      {entry.total_trades} 筆交易 · 勝率 {entry.win_rate}%
                     </p>
                   </div>
 
-                  {/* Profit */}
-                  <div className="text-right shrink-0">
-                    <span
-                      className={`text-sm font-bold ${
-                        entry.period_profit >= 0 ? "text-emerald-400" : "text-red-400"
-                      }`}
-                    >
-                      {entry.period_profit >= 0 ? "+" : ""}
-                      {formatChips(entry.period_profit)}
+                  {/* Chips balance */}
+                  <div className="text-right shrink-0 flex items-center gap-1">
+                    <Coins className="h-3.5 w-3.5 text-yellow-500" />
+                    <span className="text-sm font-bold text-amber-300">
+                      {formatChips(entry.chips_balance)}
                     </span>
                   </div>
                 </div>

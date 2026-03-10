@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Trophy, Calendar, Coins, Target, Users, TrendingUp, Award } from "lucide-react";
+import { Trophy, Calendar, Coins, Target, Users, TrendingUp, Award, Info } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { CompetitionCountdown } from "@/components/competition/CompetitionCountdown";
 
@@ -65,6 +65,19 @@ export default function CompetitionPage() {
 
         {/* Bottom bar */}
         <div className="h-1 bg-gradient-to-r from-amber-900 via-amber-400 to-amber-900" />
+      </Card>
+
+      {/* Announcement */}
+      <Card className="border-blue-500/40 bg-blue-950/30 mb-8 p-5">
+        <div className="flex gap-3">
+          <Info className="h-5 w-5 text-blue-400 flex-shrink-0 mt-0.5" />
+          <div>
+            <p className="text-sm font-bold text-blue-300 mb-1">公告：3/10 籌碼全面重置</p>
+            <p className="text-xs text-blue-400/80 leading-relaxed">
+              為確保比賽公平性，所有玩家籌碼已於 3 月 10 日統一重置為 100,000 起始籌碼。比賽正式開始，3/10 之前的籌碼變動不列入比賽排名計算。祝大家好運！
+            </p>
+          </div>
+        </div>
       </Card>
 
       {/* Rules */}
