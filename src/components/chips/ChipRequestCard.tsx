@@ -11,9 +11,12 @@ export function ChipRequestCard() {
           <Gift className="h-5 w-5 text-amber-400" />
         </div>
         <div className="flex-1 min-w-0">
-          <h3 className="font-bold text-base mb-2">
+          <h3 className="font-bold text-base mb-1">
             免費領取 100,000 籌碼
           </h3>
+          <p className="text-sm text-amber-500/90 mb-3 font-medium">
+            *備註：比賽期間不另外發送籌碼
+          </p>
           <ol className="text-sm text-muted-foreground space-y-1.5 list-decimal list-inside">
             <li>
               透過連結註冊{" "}
