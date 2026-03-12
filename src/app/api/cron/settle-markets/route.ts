@@ -172,5 +172,29 @@ export async function POST(request: Request) {
     settled.push(`${inst.symbol} @${market.strike_price} → ${outcome} (${positions.length} positions)`);
   }
 
-  return NextResponse.json({ settled, errors, settledCount: settled.length });
+  // === Fallback: ensure today's markets exist ===
+  const today = new Date().toISOString().split("T")[0];
+  const { count } = await db
+    .from("markets")
+    .select("*", { count: "exact", head: true })
+    .eq("market_date", today);
+
+  let marketsCreated = false;
+  if (!count || count === 0) {
+    try {
+      const baseUrl = new URL(request.url).origin;
+      const res = await fetch(`${baseUrl}/api/cron/create-markets`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${cronSecret}`,
+          "Content-Type": "application/json",
+        },
+      });
+      marketsCreated = res.ok;
+    } catch {
+      // Fallback creation failed — not critical
+    }
+  }
+
+  return NextResponse.json({ settled, errors, settledCount: settled.length, marketsCreated });
 }
