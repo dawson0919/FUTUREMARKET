@@ -5,6 +5,7 @@ import { Trophy, Medal, Crown, TrendingUp, TrendingDown, Minus, Coins } from "lu
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { formatChips } from "@/lib/constants";
+import { ShareButton } from "@/components/ShareButton";
 
 interface Champion {
   id: number;
@@ -80,10 +81,18 @@ export default function LeaderboardPage() {
   return (
     <div>
       <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">排行榜</h1>
-        <p className="text-muted-foreground">
-          依據累積籌碼排名 · 第一屆比賽進行中
-        </p>
+        <div className="flex items-center justify-between flex-wrap gap-4">
+          <div>
+            <h1 className="text-3xl font-bold mb-2">排行榜</h1>
+            <p className="text-muted-foreground">
+              依據累積籌碼排名 · 第一屆比賽進行中
+            </p>
+          </div>
+          <ShareButton
+            url="https://futuremarket-production.up.railway.app/leaderboard"
+            text="🏆 你敢來挑戰嗎？The Future Market 預測排行榜 — 免費籌碼競技，每日結算，冠軍獨得 500 USDT！"
+          />
+        </div>
       </div>
 
       {loading ? (
