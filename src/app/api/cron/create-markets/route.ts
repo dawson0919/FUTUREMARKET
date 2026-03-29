@@ -131,11 +131,11 @@ function generateStrikeLevels(currentPrice: number, symbol: string): number[] {
 }
 
 const STRIKE_CONFIG: Record<string, { step: number; count: number }> = {
-  BTC: { step: 2000, count: 5 },
-  ETH: { step: 50, count: 5 },
-  PAXG: { step: 50, count: 5 },
-  NQ: { step: 200, count: 5 },
-  ES: { step: 50, count: 5 },
+  BTC: { step: 2000, count: 3 },
+  ETH: { step: 50, count: 3 },
+  PAXG: { step: 50, count: 3 },
+  NQ: { step: 200, count: 3 },
+  ES: { step: 50, count: 3 },
 };
 
 function roundToStep(price: number, step: number): number {
