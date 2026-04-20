@@ -30,10 +30,12 @@ export default function HomePage() {
   const [filter, setFilter] = useState<"all" | "crypto" | "futures">("all");
   const [top3, setTop3] = useState<{ id: string; username: string | null; chips_balance: number }[]>([]);
   const [yesterdayResults, setYesterdayResults] = useState<{ id: string; question: string; result: string | null; yes_pct: number; symbol: string; icon: string }[]>([]);
+  const [champions, setChampions] = useState<{ edition: number; title: string; prize: string; champion_username: string | null; champion_avatar_url: string | null; final_chips: number; total_trades: number; wins: number; end_date: string }[]>([]);
 
   useEffect(() => {
     fetch("/api/competition/top3").then(r => r.json()).then(d => setTop3(d.top3 || [])).catch(() => {});
     fetch("/api/markets/yesterday-results").then(r => r.json()).then(d => setYesterdayResults(d.markets || [])).catch(() => {});
+    fetch("/api/champions").then(r => r.json()).then(d => setChampions(d.champions || [])).catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -223,6 +225,56 @@ export default function HomePage() {
             )}
           </div>
         </div>
+
+        {/* Past Champions */}
+        {champions.length > 0 && (
+          <div className="mb-4 space-y-3">
+            {champions.map((c) => {
+              const winRate = c.total_trades > 0 ? Math.round((c.wins / c.total_trades) * 100) : 0;
+              return (
+                <div
+                  key={c.edition}
+                  className="relative overflow-hidden rounded-xl border border-yellow-500/40 bg-gradient-to-r from-yellow-950/70 via-amber-950/60 to-yellow-950/70 px-5 py-4"
+                >
+                  <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-yellow-500/10 via-transparent to-transparent pointer-events-none" />
+                  <div className="relative flex items-center gap-4">
+                    <div className="flex-shrink-0 relative">
+                      <div className="absolute -top-1 -right-1 text-xl z-10">👑</div>
+                      {c.champion_avatar_url ? (
+                        <img
+                          src={c.champion_avatar_url}
+                          alt={c.champion_username || "champion"}
+                          className="h-16 w-16 rounded-full border-2 border-yellow-400 shadow-[0_0_20px_rgba(250,204,21,0.4)]"
+                        />
+                      ) : (
+                        <div className="h-16 w-16 rounded-full border-2 border-yellow-400 bg-yellow-900/50 flex items-center justify-center text-2xl font-bold text-yellow-200">
+                          {(c.champion_username || "?").charAt(0)}
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-yellow-400">🏆 冠軍</span>
+                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-yellow-500/20 text-yellow-300 border border-yellow-500/30 font-semibold">已結算</span>
+                      </div>
+                      <p className="text-sm text-yellow-200/70 mb-0.5 truncate">{c.title}</p>
+                      <p className="text-lg font-bold text-yellow-100 truncate">{c.champion_username || "匿名"}</p>
+                      <div className="flex flex-wrap gap-x-3 gap-y-1 mt-1 text-xs text-yellow-200/80">
+                        <span>籌碼 <span className="text-yellow-100 font-semibold">{c.final_chips.toLocaleString()}</span></span>
+                        <span>勝率 <span className="text-yellow-100 font-semibold">{winRate}%</span></span>
+                        <span>交易 <span className="text-yellow-100 font-semibold">{c.total_trades}</span></span>
+                      </div>
+                    </div>
+                    <div className="flex-shrink-0 text-right">
+                      <div className="text-[10px] text-yellow-400/70 font-semibold uppercase tracking-wider">獎金</div>
+                      <div className="text-xl font-bold text-yellow-300">{c.prize}</div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
 
         {/* Yesterday Results */}
         {yesterdayResults.length > 0 && (
