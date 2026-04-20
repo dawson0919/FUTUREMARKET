@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { TrendingUp, ChevronRight } from "lucide-react";
 import { CompetitionCountdown } from "@/components/competition/CompetitionCountdown";
+import { ClaimPrizeBanner } from "@/components/competition/ClaimPrizeBanner";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { UpDownCard } from "@/components/market/UpDownCard";
@@ -117,6 +118,9 @@ export default function HomePage() {
 
   return (
     <div>
+      {/* Claim prize banner (only visible to champions with unclaimed prizes) */}
+      <ClaimPrizeBanner />
+
       {/* Price ticker */}
       <div className="flex gap-3 overflow-x-auto pb-4 mb-6 scrollbar-hide">
         {INSTRUMENTS.map((inst) => {
